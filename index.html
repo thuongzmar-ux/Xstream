@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🦞 OpenClaw Setup Playbook</title>
+  <meta name="description" content="Hướng dẫn đầy đủ cài đặt OpenClaw + 9router bypass API + Telegram Bot trên macOS" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg2: #1e293b;
+      --bg3: #334155;
+      --surface: #1e293b;
+      --border: #334155;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --blue: #3b82f6;
+      --blue-light: #93c5fd;
+      --green: #22c55e;
+      --green-light: #86efac;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --purple: #a855f7;
+      --cyan: #06b6d4;
+      --code-bg: #0f172a;
+      --radius: 12px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR NAV */
+    .sidebar {
+      position: fixed; top: 0; left: 0;
+      width: 260px; height: 100vh;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 24px 0;
+      z-index: 100;
+    }
+    .sidebar-logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .sidebar-logo .logo-icon { font-size: 28px; }
+    .sidebar-logo h2 { font-size: 14px; font-weight: 700; color: var(--blue-light); margin-top: 4px; }
+    .sidebar-logo p { font-size: 11px; color: var(--text-muted); }
+    .nav-section { padding: 8px 20px 4px; font-size: 10px; font-weight: 700; color: var(--text-muted); letter-spacing: 1.2px; text-transform: uppercase; }
+    .nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 20px; font-size: 13px; color: var(--text-muted);
+      text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent;
+      cursor: pointer;
+    }
+    .nav-item:hover { color: var(--text); background: var(--bg3); border-left-color: var(--blue); }
+    .nav-item.active { color: var(--blue-light); background: rgba(59,130,246,0.1); border-left-color: var(--blue); }
+    .nav-badge {
+      margin-left: auto; background: var(--blue); color: white;
+      font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 600;
+    }
+
+    /* MAIN */
+    .main { margin-left: 260px; padding: 40px 48px; max-width: 980px; }
+
+    /* HEADER */
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 40%, #1a0533 100%);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 52px 48px; margin-bottom: 40px; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '🦞'; position: absolute; right: 40px; top: 30px;
+      font-size: 120px; opacity: 0.08; transform: rotate(-15deg);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.4);
+      border-radius: 20px; padding: 4px 14px; font-size: 12px;
+      color: var(--blue-light); font-weight: 600; margin-bottom: 16px;
+    }
+    .hero h1 { font-size: 36px; font-weight: 800; line-height: 1.2; margin-bottom: 12px; }
+    .hero h1 span { background: linear-gradient(90deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { font-size: 15px; color: var(--text-muted); max-width: 520px; margin-bottom: 24px; }
+    .hero-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .hero-tag {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 4px 12px; font-size: 12px;
+      font-family: 'JetBrains Mono', monospace; color: var(--cyan);
+    }
+
+    /* PREREQ TABLE */
+    .prereq-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 40px;
+    }
+    .prereq-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px 20px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .prereq-card .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; }
+    .prereq-card .value { font-size: 16px; font-weight: 700; color: var(--green-light); font-family: 'JetBrains Mono', monospace; }
+
+    /* PHASE SECTIONS */
+    .phase {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+      margin-bottom: 24px; overflow: hidden;
+    }
+    .phase-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none; transition: background 0.2s;
+    }
+    .phase-header:hover { background: rgba(255,255,255,0.03); }
+    .phase-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; flex-shrink: 0; color: white;
+    }
+    .phase-title { font-size: 17px; font-weight: 700; flex: 1; }
+    .phase-arrow { color: var(--text-muted); transition: transform 0.3s; }
+    .phase.open .phase-arrow { transform: rotate(180deg); }
+    .phase-body { padding: 24px; display: none; }
+    .phase.open .phase-body { display: block; }
+
+    /* STEPS */
+    .step { margin-bottom: 24px; }
+    .step-title { font-size: 14px; font-weight: 600; color: var(--blue-light); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .step-title::before { content: '▸'; color: var(--blue); }
+
+    /* CODE BLOCK */
+    .code-block {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden; margin: 10px 0;
+      position: relative;
+    }
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--border);
+    }
+    .code-lang { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+    .copy-btn {
+      background: none; border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text-muted); font-size: 11px; padding: 3px 10px; cursor: pointer;
+      transition: all 0.2s; font-family: 'Inter', sans-serif;
+    }
+    .copy-btn:hover { background: var(--border); color: var(--text); }
+    .copy-btn.copied { border-color: var(--green); color: var(--green); }
+    pre {
+      padding: 16px 20px; overflow-x: auto; font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; line-height: 1.7; color: #e2e8f0;
+    }
+    .c-comment { color: #64748b; }
+    .c-cmd { color: #93c5fd; }
+    .c-string { color: #86efac; }
+    .c-key { color: #c4b5fd; }
+    .c-val { color: #fcd34d; }
+    .c-ok { color: #4ade80; }
+    .c-tag { color: #f87171; }
+
+    /* ALERTS */
+    .alert {
+      border-radius: 10px; padding: 14px 18px; margin: 12px 0;
+      display: flex; gap: 10px; font-size: 13px; line-height: 1.6;
+    }
+    .alert-warn { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+    .alert-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; }
+    .alert-tip  { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; }
+    .alert-ok   { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+    .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ORDERED LIST */
+    ol.steps-list { padding-left: 20px; }
+    ol.steps-list li { margin-bottom: 6px; font-size: 14px; color: var(--text-muted); }
+    ol.steps-list li strong { color: var(--text); }
+
+    /* TROUBLESHOOT TABLE */
+    .trouble-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .trouble-table th {
+      text-align: left; padding: 10px 14px; background: rgba(59,130,246,0.15);
+      border: 1px solid var(--border); color: var(--blue-light); font-weight: 600;
+    }
+    .trouble-table td { padding: 10px 14px; border: 1px solid var(--border); vertical-align: top; }
+    .trouble-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    .trouble-table td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--red); }
+    .trouble-table td:nth-child(2) { color: var(--text-muted); }
+    .trouble-table td:nth-child(3) { color: var(--green-light); }
+
+    /* FILE TREE */
+    .file-tree {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.9;
+    }
+    .ft-dir { color: #60a5fa; }
+    .ft-file { color: #e2e8f0; }
+    .ft-comment { color: #64748b; }
+
+    /* QUICK START */
+    .quickstart {
+      background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(6,182,212,0.1));
+      border: 1px solid rgba(34,197,94,0.3); border-radius: var(--radius);
+      padding: 24px 28px; margin-bottom: 24px;
+    }
+    .quickstart h3 { color: var(--green-light); font-size: 18px; margin-bottom: 12px; }
+
+    /* FOOTER */
+    footer {
+      text-align: center; padding: 32px; color: var(--text-muted); font-size: 12px;
+      border-top: 1px solid var(--border); margin-top: 40px;
+    }
+
+    /* PROGRESS BAR */
+    .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--blue), var(--purple)); z-index: 200; transition: width 0.1s; width: 0%; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 24px 20px; }
+      .prereq-grid { grid-template-columns: 1fr 1fr; }
+      .hero { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🦞</div>
+    <h2>OpenClaw Playbook</h2>
+    <p>v2026.4.5 · macOS</p>
+  </div>
+  <div class="nav-section">Setup</div>
+  <a class="nav-item" href="#phase1">📦 Cài OpenClaw</a>
+  <a class="nav-item" href="#phase2">🚀 Khởi động Gateway</a>
+  <a class="nav-item" href="#phase3">💬 Kết nối Telegram</a>
+  <a class="nav-item" href="#phase4">🔀 Cài 9router</a>
+  <a class="nav-item" href="#phase5">⚙️ Cấu hình Bypass</a>
+  <a class="nav-item" href="#phase6">✅ Test</a>
+  <div class="nav-section">Reference</div>
+  <a class="nav-item" href="#trouble">🔧 Troubleshooting <span class="nav-badge">6</span></a>
+  <a class="nav-item" href="#maintenance">🛠 Maintenance</a>
+  <a class="nav-item" href="#files">📁 File Structure</a>
+  <a class="nav-item" href="#quickstart">⚡ Quick Start</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">📖 Playbook</div>
+    <h1>🦞 <span>OpenClaw</span> Setup Guide</h1>
+    <p>Hướng dẫn đầy đủ cài đặt OpenClaw + 9router Bypass API + Telegram Bot trên macOS</p>
+    <div class="hero-tags">
+      <span class="hero-tag">OpenClaw v2026.4.5</span>
+      <span class="hero-tag">9router v0.3.82</span>
+      <span class="hero-tag">macOS</span>
+      <span class="hero-tag">Node.js ≥ 22.12</span>
+    </div>
+  </div>
+
+  <!-- PREREQS -->
+  <div class="prereq-grid">
+    <div class="prereq-card">
+      <span class="label">Node.js</span>
+      <span class="value">≥ 22.12.0</span>
+    </div>
+    <div class="prereq-card">
+      <span class="label">npm</span>
+      <span class="value">≥ 11.x</span>
+    </div>
+    <div class="prereq-card">
+      <span class="label">macOS</span>
+      <span class="value">Monterey+</span>
+    </div>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase open" id="phase1">
+    <div class="phase-header" onclick="toggle(this)">
+      <div class="phase-num">1</div>
+      <div class="phase-title">Cài OpenClaw</div>
+      <div class="phase-arrow">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="step">
+        <div class="step-title">Chạy installer script</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="c-comment"># Cài OpenClaw global qua curl</span>
+<span class="c-cmd">curl</span> -fsSL https://openclaw.ai/install.sh <span class="c-string">|</span> bash
+
+<span class="c-comment"># Verify cài đặt thành công</span>
+<span class="c-cmd">openclaw</span> --version
+<span class="c-ok"># → OpenClaw 2026.4.5 (3e72c03)</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase open" id="phase2">
+    <div class="phase-header" onclick="toggle(this)">
+      <div class="phase-num">2</div>
+      <div class="phase-title">Khởi động Gateway</div>
+      <div class="phase-arrow">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="step">
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="c-comment"># Khởi động gateway daemon (tự restart khi reboot)</span>
+<span class="c-cmd">openclaw</span> gateway start
+
+<span class="c-comment"># Kiểm tra trạng thái</span>
+<span class="c-cmd">openclaw</span> status</pre>
+        </div>
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <span>Gateway chạy tại <code>ws://127.0.0.1:18789</code> · Control UI: <code>http://127.0.0.1:18789</code></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase open" id="phase3">
+    <div class="phase-header" onclick="toggle(this)">
+      <div class="phase-num">3</div>
+      <div class="phase-title">Kết nối Telegram Bot</div>
+      <div class="phase-arrow">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="step">
+        <div class="step-title">3.1 Tạo bot từ BotFather</div>
+        <ol class="steps-list">
+          <li>Vào Telegram → tìm <strong>@BotFather</strong></li>
+          <li>Gửi <strong>/newbot</strong> → đặt tên → lấy <strong>Bot Token</strong></li>
+        </ol>
+      </div>
+      <div class="step">
+        <div class="step-title">3.2 Đấu nối bot vào OpenClaw</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="c-cmd">openclaw</span> channels add --channel telegram --token <span class="c-val">&lt;BOT_TOKEN&gt;</span>
+
+<span class="c-comment"># Verify</span>
+<span class="c-cmd">openclaw</span> channels status --probe
+<span class="c-ok"># → Telegram default: enabled, configured, running, works ✅</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-title">3.3 Pair tài khoản Telegram của bạn</div>
+        <ol class="steps-list">
+          <li>Vào bot Telegram → gửi <strong>/start</strong></li>
+          <li>Bot trả về <strong>Pairing Code</strong> (VD: <code>F2F7D3JA</code>)</li>
+          <li>Chạy lệnh approve trên máy:</li>
+        </ol>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="c-cmd">openclaw</span> pairing approve telegram <span class="c-val">&lt;PAIRING_CODE&gt;</span>
+<span class="c-ok"># → Approved telegram sender &lt;user_id&gt;</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase open" id="phase4">
+    <div class="phase-header" onclick="toggle(this)">
+      <div class="phase-num">4</div>
+      <div class="phase-title">Cài 9router — API Bypass Proxy</div>
+      <div class="phase-arrow">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="step">
+        <div class="step-title">4.1 Cài và khởi động</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="c-cmd">npm</span> install -g 9router
+
+<span class="c-comment"># Chạy background (system tray)</span>
+<span class="c-cmd">9router</span> --tray
+<span class="c-ok"># → 🚀 9router v0.3.82</span>
+<span class="c-ok"># → Server: http://localhost:20128</span></pre>
+        </div>
+        <div class="alert alert-info">
+          <span class="alert-icon">🌐</span>
+          <span>Dashboard: <strong>http://localhost:20128/dashboard</strong></span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-title">4.2 Kết nối API vào 9router dashboard</div>
+        <ol class="steps-list">
+          <li>Mở dashboard → <strong>Providers</strong> → chọn provider (VD: <em>OpenAI Codex</em>)</li>
+          <li>Click <strong>Add account</strong> → nhập API key → Save</li>
+          <li>Vào <strong>Available Models</strong> → note các model ID (VD: <code>cx/gpt-5.4</code>)</li>
+        </ol>
+        <div class="alert alert-warn">
+          <span class="alert-icon">⚠️</span>
+          <span><strong>QUAN TRỌNG:</strong> Model của 9router dùng prefix riêng như <code>cx/gpt-5.4</code>, KHÔNG phải <code>gpt-4o</code> chuẩn. Phải dùng đúng model ID này khi config OpenClaw.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase open" id="phase5">
+    <div class="phase-header" onclick="toggle(this)">
+      <div class="phase-num">5</div>
+      <div class="phase-title">Cấu hình OpenClaw dùng 9router</div>
+      <div class="phase-arrow">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="step">
+        <div class="step-title">5.1 Sửa ~/.openclaw/openclaw.json</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre>{
+  <span class="c-key">"gateway"</span>: {
+    <span class="c-key">"mode"</span>: <span class="c-string">"local"</span>,
+    <span class="c-key">"auth"</span>: { <span class="c-key">"mode"</span>: <span class="c-string">"token"</span>, <span class="c-key">"token"</span>: <span class="c-val">"&lt;GATEWAY_TOKEN&gt;"</span> }
+  },
+  <span class="c-key">"channels"</span>: {
+    <span class="c-key">"telegram"</span>: {
+      <span class="c-key">"token"</span>: <span class="c-val">"&lt;BOT_TOKEN&gt;"</span>, <span class="c-key">"enabled"</span>: <span class="c-string">true</span>,
+      <span class="c-key">"accounts"</span>: { <span class="c-key">"default"</span>: { <span class="c-key">"token"</span>: <span class="c-val">"&lt;BOT_TOKEN&gt;"</span> } },
+      <span class="c-key">"botToken"</span>: <span class="c-val">"&lt;BOT_TOKEN&gt;"</span>
+    }
+  },
+  <span class="c-key">"agents"</span>: {
+    <span class="c-key">"defaults"</span>: {
+      <span class="c-key">"memorySearch"</span>: { <span class="c-key">"enabled"</span>: <span class="c-string">false</span> },
+      <span class="c-key">"model"</span>: { <span class="c-key">"primary"</span>: <span class="c-string">"9router/cx/gpt-5.4"</span> }
+    }
+  },
+  <span class="c-key">"models"</span>: {
+    <span class="c-key">"mode"</span>: <span class="c-string">"merge"</span>,
+    <span class="c-key">"providers"</span>: {
+      <span class="c-key">"9router"</span>: {
+        <span class="c-key">"baseUrl"</span>: <span class="c-string">"http://localhost:20128/v1"</span>,
+        <span class="c-key">"apiKey"</span>: <span class="c-string">"sk-9router"</span>,
+        <span class="c-key">"api"</span>: <span class="c-string">"openai-completions"</span>,
+        <span class="c-key">"models"</span>: [
+          { <span class="c-key">"id"</span>: <span class="c-string">"cx/gpt-5.4"</span>, <span class="c-key">"name"</span>: <span class="c-string">"cx/gpt-5.4"</span> },
+          { <span class="c-key">"id"</span>: <span class="c-string">"cx/gpt-5.3-codex"</span>, <span class="c-key">"name"</span>: <span class="c-string">"cx/gpt-5.3-codex"</span> },
+          { <span class="c-key">"id"</span>: <span class="c-string">"cx/gpt-5.1-codex-mini"</span>, <span class="c-key">"name"</span>: <span class="c-string">"cx/gpt-5.1-codex-mini"</span> }
+        ]
+      }
+    }
+  }
+}</pre>
+        </div>
+        <div class="alert alert-tip">
+          <span class="alert-icon">💡</span>
+          <span><strong>apiKey</strong> có thể là bất kỳ string — 9router không validate, tự dùng key đã nhập trong dashboard. GATEWAY_TOKEN lấy từ file openclaw.json gốc.</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title">5.2 Thêm env vars vào LaunchAgent plist</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">File: <code>~/Library/LaunchAgents/ai.openclaw.gateway.plist</code> — thêm vào trong block <code>&lt;EnvironmentVariables&gt;</code> trước <code>&lt;/dict&gt;</code>:</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">xml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="c-tag">&lt;key&gt;</span>OPENAI_API_KEY<span class="c-tag">&lt;/key&gt;</span>
+<span class="c-tag">&lt;string&gt;</span>sk-9router-bypass<span class="c-tag">&lt;/string&gt;</span>
+<span class="c-tag">&lt;key&gt;</span>OPENAI_BASE_URL<span class="c-tag">&lt;/key&gt;</span>
+<span class="c-tag">&lt;string&gt;</span>http://localhost:20128/v1<span class="c-tag">&lt;/string&gt;</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title">5.3 Reload daemon</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="c-comment"># Unload daemon cũ</span>
+<span class="c-cmd">launchctl</span> bootout gui/$(id -u)/ai.openclaw.gateway
+
+<span class="c-comment"># Load lại với config mới</span>
+<span class="c-cmd">launchctl</span> bootstrap gui/$(id -u) ~/Library/LaunchAgents/ai.openclaw.gateway.plist
+
+<span class="c-comment"># Verify env vars đã load</span>
+<span class="c-cmd">launchctl</span> print gui/$(id -u)/ai.openclaw.gateway | grep OPENAI
+<span class="c-ok"># → OPENAI_API_KEY => sk-9router-bypass</span>
+<span class="c-ok"># → OPENAI_BASE_URL => http://localhost:20128/v1</span></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-title">5.4 Verify model config</div>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="c-cmd">openclaw</span> models status
+<span class="c-ok"># → Default: 9router/cx/gpt-5.4</span>
+<span class="c-ok"># → 9router effective=models.json ✅</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 6 -->
+  <div class="phase open" id="phase6">
+    <div class="phase-header" onclick="toggle(this)">
+      <div class="phase-num">6</div>
+      <div class="phase-title">Test hoạt động</div>
+      <div class="phase-arrow">▾</div>
+    </div>
+    <div class="phase-body">
+      <ol class="steps-list">
+        <li>Vào Telegram bot → gửi <strong>/new</strong> (tạo session mới)</li>
+        <li>Nhắn bất kỳ tin nhắn → bot phải trả lời</li>
+      </ol>
+      <div class="alert alert-ok" style="margin-top:12px;">
+        <span class="alert-icon">✅</span>
+        <span>Nếu bot trả lời → Setup hoàn tất! API đang được route qua 9router.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TROUBLESHOOTING -->
+  <div class="phase open" id="trouble">
+    <div class="phase-header" onclick="toggle(this)">
+      <div class="phase-num">🔧</div>
+      <div class="phase-title">Troubleshooting</div>
+      <div class="phase-arrow">▾</div>
+    </div>
+    <div class="phase-body">
+      <table class="trouble-table">
+        <thead>
+          <tr><th>Lỗi</th><th>Nguyên nhân</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>401 Incorrect API key: sk-9router...</td>
+            <td>OpenClaw gọi thẳng OpenAI thật, không qua 9router</td>
+            <td>Kiểm tra OPENAI_BASE_URL trong plist đã reload chưa</td>
+          </tr>
+          <tr>
+            <td>404 No active credentials for provider: openai</td>
+            <td>9router nhận gpt-4o nhưng không có OpenAI key thật</td>
+            <td>Đổi model sang cx/gpt-5.4 trong openclaw.json</td>
+          </tr>
+          <tr>
+            <td>Unknown model: cx/gpt-5.4</td>
+            <td>Custom provider chưa khai báo trong config</td>
+            <td>Thêm models.providers.9router vào openclaw.json</td>
+          </tr>
+          <tr>
+            <td>pairing required</td>
+            <td>2 gateway instances chạy cùng lúc</td>
+            <td>openclaw gateway stop → openclaw gateway start</td>
+          </tr>
+          <tr>
+            <td>Something went wrong</td>
+            <td>Session cũ bị lỗi / model chưa set</td>
+            <td>Gửi /new trong Telegram; kiểm tra openclaw models status</td>
+          </tr>
+          <tr>
+            <td>Bot im lặng sau reboot</td>
+            <td>9router chưa chạy lại</td>
+            <td>Chạy: 9router --tray</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MAINTENANCE -->
+  <div class="phase open" id="maintenance">
+    <div class="phase-header" onclick="toggle(this)">
+      <div class="phase-num">🛠</div>
+      <div class="phase-title">Maintenance</div>
+      <div class="phase-arrow">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="c-comment"># Dọn session lỗi</span>
+<span class="c-cmd">openclaw</span> sessions cleanup \
+  --store ~/.openclaw/agents/main/sessions/sessions.json \
+  --enforce --fix-missing
+
+<span class="c-comment"># Kiểm tra sức khỏe</span>
+<span class="c-cmd">openclaw</span> doctor
+
+<span class="c-comment"># Xem log realtime</span>
+<span class="c-cmd">tail</span> -f /tmp/openclaw/openclaw-$(date +%Y-%m-%d).log
+
+<span class="c-comment"># Cập nhật</span>
+<span class="c-cmd">openclaw</span> update
+<span class="c-cmd">npm</span> update -g 9router</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILE STRUCTURE -->
+  <div class="phase open" id="files">
+    <div class="phase-header" onclick="toggle(this)">
+      <div class="phase-num">📁</div>
+      <div class="phase-title">Cấu trúc file quan trọng</div>
+      <div class="phase-arrow">▾</div>
+    </div>
+    <div class="phase-body">
+      <div class="file-tree">
+<span class="ft-dir">~/.openclaw/</span>
+├── <span class="ft-file">openclaw.json</span>              <span class="ft-comment">← Config chính (gateway, channels, models)</span>
+├── <span class="ft-dir">agents/main/agent/</span>
+│   └── <span class="ft-file">models.json</span>            <span class="ft-comment">← Auto-generated từ openclaw.json</span>
+├── <span class="ft-dir">workspace/</span>                 <span class="ft-comment">← AGENTS.md, SOUL.md, IDENTITY.md</span>
+└── <span class="ft-dir">logs/</span>
+    ├── <span class="ft-file">gateway.log</span>
+    └── <span class="ft-file">gateway.err.log</span>
+
+<span class="ft-dir">~/Library/LaunchAgents/</span>
+└── <span class="ft-file">ai.openclaw.gateway.plist</span>  <span class="ft-comment">← Daemon config (OPENAI env vars ở đây)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK START -->
+  <div class="quickstart" id="quickstart">
+    <h3>⚡ Quick Start sau mỗi lần reboot</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="c-comment"># Bước 1: BẮT BUỘC — Start 9router</span>
+<span class="c-cmd">9router</span> --tray
+
+<span class="c-comment"># Bước 2: Gateway tự chạy qua LaunchAgent (không cần làm gì)</span>
+<span class="c-cmd">openclaw</span> status   <span class="c-comment"># kiểm tra</span>
+
+<span class="c-ok"># ✅ Telegram bot online ngay!</span></pre>
+    </div>
+    <div class="alert alert-warn" style="margin-top:12px;">
+      <span class="alert-icon">⚠️</span>
+      <span>9router <strong>KHÔNG tự chạy khi reboot</strong>. Phải mở tay hoặc thêm vào Login Items trong System Preferences.</span>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>🦞 OpenClaw Setup Playbook · Verified: OpenClaw v2026.4.5 · 9router v0.3.82 · macOS</p>
+    <p style="margin-top:6px;opacity:0.5;">Generated by Antigravity AI · <a href="https://openclaw.ai" style="color:var(--blue-light);">openclaw.ai</a> · <a href="https://github.com/decolua/9router" style="color:var(--blue-light);">9router</a></p>
+  </footer>
+
+</main>
+
+<script>
+  // Toggle phases
+  function toggle(header) {
+    const phase = header.parentElement;
+    phase.classList.toggle('open');
+  }
+
+  // Copy code
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copied';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = (scrollTop / docHeight) * 100;
+    document.getElementById('progress').style.width = pct + '%';
+  });
+
+  // Active nav highlight
+  const sections = document.querySelectorAll('[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navItems.forEach(item => {
+      item.classList.toggle('active', item.getAttribute('href') === '#' + current);
+    });
+  });
+</script>
+</body>
+</html>
