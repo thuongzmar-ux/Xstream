@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agency CRM</title>
+  <meta name="description" content="CRM nội bộ cho agency — quản lý công ty, deal pipeline, hợp đồng, chăm sóc khách hàng">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:    #f4f6fb;
+      --bg2:   #ffffff;
+      --bg3:   #f0f2f8;
+      --bghov: #e8ecf6;
+      --border:#dde2ef;
+      --border2:#c8cfe6;
+      --accent:#5a67f2;
+      --accent-h:#4752d8;
+      --accent-m:rgba(90,103,242,.10);
+      --violet:#7c56e8;
+      --tx:    #111827;
+      --tx2:   #4b5563;
+      --txm:   #9ca3af;
+      --ok:    #059669;
+      --ok-m:  rgba(5,150,105,.10);
+      --warn:  #b45309;
+      --warn-m:rgba(180,83,9,.10);
+      --err:   #dc2626;
+      --err-m: rgba(220,38,38,.10);
+      --info:  #2563eb;
+      --info-m:rgba(37,99,235,.10);
+      --sidebar:220px;
+      --top:56px;
+      --r:7px; --rl:10px;
+      --shadow:0 1px 6px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.04);
+      --tr:all .18s ease;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--tx);height:100vh;display:flex;overflow:hidden;font-size:14px;line-height:1.5}
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+    /* SIDEBAR */
+    .sb{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;flex-shrink:0;z-index:100}
+    .sb-logo{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .logo-mark{width:30px;height:30px;background:var(--accent);border-radius:7px;flex-shrink:0}
+    .logo-text{font-size:13px;font-weight:800;letter-spacing:-.3px;color:var(--tx)}
+    .logo-sub{font-size:10px;color:var(--txm)}
+    .sb-nav{padding:10px 8px;flex:1;overflow-y:auto}
+    .nav-group{margin-bottom:8px}
+    .nav-label{font-size:10px;font-weight:700;color:var(--txm);text-transform:uppercase;letter-spacing:.7px;padding:8px 10px 4px}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r);cursor:pointer;transition:var(--tr);color:var(--tx2);font-size:13px;font-weight:500;margin-bottom:1px;user-select:none}
+    .nav-item:hover{background:var(--bg3);color:var(--tx)}
+    .nav-item.active{background:var(--accent-m);color:var(--accent);font-weight:600}
+    .nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:var(--tr)}
+    .nav-item.active .nav-dot{background:var(--accent)}
+    .nav-badge{margin-left:auto;background:var(--err);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+    .sb-foot{padding:10px;border-top:1px solid var(--border)}
+    .user-card{display:flex;align-items:center;gap:9px;padding:8px;border-radius:var(--r);cursor:pointer;transition:var(--tr)}
+    .user-card:hover{background:var(--bg3)}
+    .avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+    .un{font-size:12px;font-weight:600;color:var(--tx)}.ur{font-size:10px;color:var(--txm)}
+
+    /* MAIN */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .topbar{height:var(--top);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:14px;flex-shrink:0}
+    .topbar-title{font-size:14px;font-weight:700;flex:1;color:var(--tx)}
+    .searchbox{display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:6px 12px;width:220px;transition:var(--tr)}
+    .searchbox:focus-within{border-color:var(--accent);background:#fff}
+    .searchbox input{background:none;border:none;outline:none;color:var(--tx);font-size:13px;width:100%;font-family:inherit}
+    .searchbox input::placeholder{color:var(--txm)}
+    .content{flex:1;overflow-y:auto;padding:22px}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r);border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:var(--tr);white-space:nowrap}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 4px rgba(90,103,242,.3)}
+    .btn-primary:hover{background:var(--accent-h);transform:translateY(-1px)}
+    .btn-secondary{background:var(--bg2);color:var(--tx2);border:1px solid var(--border)}
+    .btn-secondary:hover{background:var(--bg3);color:var(--tx)}
+    .btn-danger{background:var(--err-m);color:var(--err);border:1px solid transparent}
+    .btn-danger:hover{background:var(--err);color:#fff}
+    .btn-ok{background:var(--ok-m);color:var(--ok);border:1px solid transparent}
+    .btn-ok:hover{background:var(--ok);color:#fff}
+    .btn-sm{padding:4px 10px;font-size:12px}
+
+    /* CARDS */
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:18px;box-shadow:var(--shadow)}
+    .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+    .ptitle{font-size:20px;font-weight:800;letter-spacing:-.4px;color:var(--tx)}
+    .psub{font-size:12px;color:var(--txm);margin-top:2px}
+
+    /* STATS */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+    .stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:18px;position:relative;transition:var(--tr);box-shadow:var(--shadow)}
+    .stat:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.08)}
+    .stat::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--rl) var(--rl) 0 0}
+    .stat.blue::after{background:var(--accent)}
+    .stat.green::after{background:var(--ok)}
+    .stat.orange::after{background:var(--warn)}
+    .stat.red::after{background:var(--err)}
+    .slabel{font-size:10px;font-weight:700;color:var(--txm);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+    .sval{font-size:24px;font-weight:800;letter-spacing:-1px;line-height:1;color:var(--tx)}
+    .ssub{font-size:11px;color:var(--txm);margin-top:5px}
+
+    /* TABLE */
+    .twrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadow)}
+    .tbl{width:100%;border-collapse:collapse}
+    .tbl th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--txm);text-transform:uppercase;letter-spacing:.5px;background:var(--bg3);border-bottom:1px solid var(--border)}
+    .tbl td{padding:12px 14px;font-size:13px;color:var(--tx);border-bottom:1px solid var(--border);vertical-align:middle}
+    .tbl tr:last-child td{border-bottom:none}
+    .tbl tbody tr{transition:var(--tr);cursor:pointer}
+    .tbl tbody tr:hover{background:var(--bg3)}
+
+    /* BADGE */
+    .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+    .b-ok{background:var(--ok-m);color:var(--ok)}
+    .b-warn{background:var(--warn-m);color:var(--warn)}
+    .b-err{background:var(--err-m);color:var(--err)}
+    .b-info{background:var(--info-m);color:var(--info)}
+    .b-purple{background:rgba(124,86,232,.1);color:var(--violet)}
+    .b-def{background:var(--bg3);color:var(--tx2);border:1px solid var(--border)}
+
+    /* MODAL */
+    .mo{position:fixed;inset:0;background:rgba(17,24,39,.4);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(3px);animation:fi .15s ease}
+    .mo.open{display:flex}
+    .mbox{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);width:90%;max-width:520px;max-height:90vh;overflow-y:auto;animation:su .2s ease;box-shadow:0 8px 40px rgba(0,0,0,.12)}
+    .mbox.wide{max-width:660px}
+    .mhead{padding:18px 22px 0;display:flex;align-items:center;justify-content:space-between}
+    .mtitle{font-size:15px;font-weight:700;color:var(--tx)}
+    .mclose{width:28px;height:28px;background:var(--bg3);border:none;border-radius:6px;cursor:pointer;color:var(--tx2);font-size:14px;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
+    .mclose:hover{background:var(--border);color:var(--tx)}
+    .mbody{padding:18px 22px 22px}
+
+    /* FORM */
+    .fg{margin-bottom:13px}
+    .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .flabel{display:block;font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+    .fc{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:8px 11px;color:var(--tx);font-size:13px;font-family:inherit;transition:var(--tr);outline:none}
+    .fc:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px var(--accent-m)}
+    .fc::placeholder{color:var(--txm)}
+    select.fc option{background:var(--bg2)}
+    textarea.fc{resize:vertical;min-height:75px}
+    .fact{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:14px;border-top:1px solid var(--border)}
+
+    /* KANBAN */
+    .kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:14px;min-height:calc(100vh - 180px)}
+    .kcol{min-width:248px;width:248px;display:flex;flex-direction:column;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadow)}
+    .khead{padding:11px 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--bg3)}
+    .ktitle{font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px;color:var(--tx2)}
+    .kcount{background:var(--border);color:var(--tx2);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+    .kval{font-size:11px;color:var(--txm)}
+    .kcards{padding:9px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:7px;min-height:80px}
+    .kcards.drag-over{background:var(--accent-m)}
+    .dcard{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px;cursor:grab;transition:var(--tr);user-select:none}
+    .dcard:hover{border-color:var(--accent);box-shadow:0 2px 10px rgba(90,103,242,.12)}
+    .dcard.dragging{opacity:.4;cursor:grabbing}
+    .dc-co{font-size:13px;font-weight:700;margin-bottom:2px;color:var(--tx)}
+    .dc-svc{font-size:11px;color:var(--accent);margin-bottom:7px;font-weight:500}
+    .dc-val{font-size:14px;font-weight:800;margin-bottom:7px;color:var(--tx)}
+    .dc-meta{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--txm)}
+    .dc-av{width:20px;height:20px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
+
+    /* TOAST */
+    .toasts{position:fixed;bottom:20px;right:20px;z-index:2000;display:flex;flex-direction:column;gap:7px}
+    .toast{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 15px;display:flex;align-items:center;gap:9px;min-width:250px;box-shadow:0 4px 20px rgba(0,0,0,.1);animation:si .25s ease;font-size:13px}
+    .toast.ok{border-left:3px solid var(--ok)}
+    .toast.err{border-left:3px solid var(--err)}
+    .toast.info{border-left:3px solid var(--accent)}
+    .t-ok{color:var(--ok);font-weight:700}
+    .t-err{color:var(--err);font-weight:700}
+    .t-info{color:var(--accent);font-weight:700}
+
+    /* EMPTY */
+    .empty{text-align:center;padding:50px 20px;color:var(--txm)}
+    .emtitle{font-size:14px;font-weight:600;color:var(--tx2);margin-bottom:7px}
+    .emtext{font-size:12px;margin-bottom:16px}
+
+    /* ACTIVITY */
+    .aitem{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+    .aitem:last-child{border-bottom:none}
+    .adot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;color:#fff}
+    .acontent{flex:1}
+    .atext{font-size:13px;color:var(--tx);margin-bottom:2px}
+    .atime{font-size:11px;color:var(--txm)}
+
+    /* MISC */
+    .sec-title{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+    .fbar{display:flex;gap:9px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
+    .stage-bar{height:4px;border-radius:4px;transition:width .5s ease}
+
+    /* PROGRESS BAR */
+    .prog-row{margin-bottom:10px}
+    .prog-labels{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+    .prog-track{background:var(--bg3);border-radius:4px;height:5px;overflow:hidden;border:1px solid var(--border)}
+
+    @keyframes fi{from{opacity:0}to{opacity:1}}
+    @keyframes su{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes si{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="logo-mark"></div>
+    <div>
+      <div class="logo-text">Agency CRM</div>
+      <div class="logo-sub">v1.0 · B2B</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-group">
+      <div class="nav-label">Tổng quan</div>
+      <div class="nav-item active" onclick="go('dashboard')" data-p="dashboard"><span class="nav-dot"></span>Dashboard</div>
+      <div class="nav-item" onclick="go('companies')" data-p="companies"><span class="nav-dot"></span>Công ty</div>
+      <div class="nav-item" onclick="go('pipeline')" data-p="pipeline"><span class="nav-dot"></span>Pipeline</div>
+      <div class="nav-item" onclick="go('contracts')" data-p="contracts"><span class="nav-dot"></span>Hợp đồng</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Công cụ</div>
+      <div class="nav-item" onclick="go('reminders')" data-p="reminders">
+        <span class="nav-dot"></span>Nhắc việc
+        <span class="nav-badge" id="rbadge" style="display:none">0</span>
+      </div>
+      <div class="nav-item" onclick="go('services')" data-p="services"><span class="nav-dot"></span>Dịch vụ</div>
+    </div>
+  </nav>
+  <div class="sb-foot">
+    <div class="user-card">
+      <div class="avatar">H</div>
+      <div><div class="un">Hường</div><div class="ur">Owner · Agency CRM</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="ptitle">Dashboard</div>
+    <div class="searchbox">
+      <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--txm);flex-shrink:0"><circle cx="9" cy="9" r="7"/><path d="M15 15l4 4"/></svg>
+      <input type="text" id="gsearch" placeholder="Tìm công ty, deal..." oninput="gSearch(this.value)">
+    </div>
+  </div>
+  <div class="content" id="mc"></div>
+</div>
+
+<!-- MODAL -->
+<div class="mo" id="mo" onclick="closeMo(event)">
+  <div class="mbox" id="mbox">
+    <div class="mhead">
+      <div class="mtitle" id="mtitle"></div>
+      <button class="mclose" onclick="closeMo()">✕</button>
+    </div>
+    <div class="mbody" id="mbody"></div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ── DATA LAYER ──────────────────────────────────────
+const DB = {
+  get(k){try{return JSON.parse(localStorage.getItem('crm_'+k))||[];}catch{return[];}},
+  set(k,v){localStorage.setItem('crm_'+k,JSON.stringify(v));},
+  id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+};
+
+// ── SEED ────────────────────────────────────────────
+function seed(){
+  if(DB.get('seeded').length)return;
+  DB.set('services',[
+    {id:'s1',name:'TikTok Growth Partner',category:'marketing',basePrice:15000000,durationMonths:3,description:'Vận hành TikTok Shop toàn diện: KOC booking, content brief, báo cáo hàng tuần'},
+    {id:'s2',name:'KOC Booking Package',category:'marketing',basePrice:8000000,durationMonths:1,description:'Booking KOC theo số lượng, brief content, tracking kết quả'},
+    {id:'s3',name:'Facebook Ads Management',category:'marketing',basePrice:5000000,durationMonths:1,description:'Quản lý quảng cáo Facebook & Instagram, tối ưu ROAS'},
+    {id:'s4',name:'Shopee Optimization',category:'operations',basePrice:6000000,durationMonths:2,description:'Tối ưu listing, SEO sản phẩm, setup voucher & flash sale'},
+  ]);
+  DB.set('companies',[
+    {id:'c1',name:'BYEALCO',industry:'Fashion & Beauty',size:'10-50',source:'Referral',status:'active',assignedTo:'Hường',tags:[],createdAt:ago(90)},
+    {id:'c2',name:'Runcation Vietnam',industry:'Sports & Lifestyle',size:'1-10',source:'Facebook',status:'active',assignedTo:'Sales A',tags:[],createdAt:ago(60)},
+    {id:'c3',name:'ZME Agency',industry:'Agency',size:'10-50',source:'Referral',status:'prospect',assignedTo:'Sales B',tags:[],createdAt:ago(30)},
+    {id:'c4',name:'Skincare Plus',industry:'Beauty & Cosmetics',size:'1-10',source:'Cold outreach',status:'expiring',assignedTo:'Hường',tags:[],createdAt:ago(120)},
+  ]);
+  DB.set('contacts',[
+    {id:'ct1',companyId:'c1',name:'Nguyễn Thị Lan',role:'CEO',phone:'0901234567',email:'lan@byealco.vn',isPrimary:true,createdAt:now()},
+    {id:'ct2',companyId:'c1',name:'Trần Văn Minh',role:'Marketing Manager',phone:'0912345678',email:'minh@byealco.vn',isPrimary:false,createdAt:now()},
+    {id:'ct3',companyId:'c2',name:'Phạm Thu Hà',role:'Founder',phone:'0923456789',email:'ha@runcation.vn',isPrimary:true,createdAt:now()},
+    {id:'ct4',companyId:'c3',name:'Lê Quốc Bảo',role:'Director',phone:'0934567890',email:'bao@zme.vn',isPrimary:true,createdAt:now()},
+  ]);
+  DB.set('deals',[
+    {id:'d1',companyId:'c1',serviceId:'s1',title:'TikTok Growth Q2/2026',value:15000000,stage:'won',assignedTo:'Hường',expectedCloseDate:'2026-04-01',lostReason:'',createdAt:ago(30)},
+    {id:'d2',companyId:'c2',serviceId:'s3',title:'FB Ads Tháng 4',value:5000000,stage:'consulting',assignedTo:'Sales A',expectedCloseDate:'2026-04-20',lostReason:'',createdAt:ago(10)},
+    {id:'d3',companyId:'c3',serviceId:'s2',title:'KOC Booking Tháng 5',value:8000000,stage:'pending',assignedTo:'Sales B',expectedCloseDate:'2026-04-30',lostReason:'',createdAt:ago(5)},
+    {id:'d4',companyId:'c4',serviceId:'s4',title:'Shopee Optimization',value:6000000,stage:'new',assignedTo:'Hường',expectedCloseDate:'2026-05-15',lostReason:'',createdAt:now()},
+  ]);
+  DB.set('contracts',[
+    {id:'k1',companyId:'c1',dealId:'d1',serviceId:'s1',value:15000000,startDate:'2026-04-01',endDate:'2026-06-30',renewalStatus:'active',accountManager:'Hường',notes:'Khách VIP, chăm sóc định kỳ',createdAt:now()},
+    {id:'k2',companyId:'c4',dealId:'',serviceId:'s3',value:5000000,startDate:'2026-01-01',endDate:'2026-04-30',renewalStatus:'expiring_soon',accountManager:'Hường',notes:'Cần liên hệ gia hạn trước 30/4',createdAt:now()},
+  ]);
+  DB.set('activities',[
+    {id:'a1',companyId:'c1',dealId:'d1',contractId:'',type:'meeting',content:'Kick-off dự án TikTok Q2, thống nhất KPI và content plan tháng 4',createdAt:ago(5),createdBy:'Hường'},
+    {id:'a2',companyId:'c2',dealId:'d2',contractId:'',type:'call',content:'Tư vấn gói FB Ads, khách quan tâm ROAS 4x và ngân sách 10M/tháng',createdAt:ago(2),createdBy:'Sales A'},
+    {id:'a3',companyId:'c3',dealId:'d3',contractId:'',type:'message',content:'Gửi bảng giá KOC booking và proposal 3 gói. Đang chờ khách confirm ngân sách.',createdAt:ago(1),createdBy:'Sales B'},
+  ]);
+  DB.set('reminders',[
+    {id:'r1',companyId:'c4',dealId:'',contractId:'k2',type:'renewal',dueDate:fd(new Date(Date.now()+3*864e5)),note:'Hợp đồng FB Ads sắp hết hạn 30/4 — cần liên hệ gia hạn',isDone:false,assignedTo:'Hường'},
+    {id:'r2',companyId:'c3',dealId:'d3',contractId:'',type:'follow_up',dueDate:fd(new Date(Date.now()+864e5)),note:'Follow-up gói KOC Booking — check khách đã duyệt ngân sách chưa',isDone:false,assignedTo:'Sales B'},
+  ]);
+  DB.set('seeded',[1]);
+}
+
+// ── HELPERS ─────────────────────────────────────────
+function now(){return new Date().toISOString();}
+function ago(d){return new Date(Date.now()-d*864e5).toISOString();}
+function fd(d){if(!d)return'';const dt=new Date(d);return dt.toISOString().split('T')[0];}
+function fmtDate(d){if(!d)return'—';const dt=new Date(d);return dt.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});}
+function money(n){if(!n)return'—';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(0)+'M';return n.toLocaleString('vi-VN');}
+function daysTo(s){const n=new Date();n.setHours(0,0,0,0);const d=new Date(s);d.setHours(0,0,0,0);return Math.round((d-n)/864e5);}
+function timeAgo(s){const d=Date.now()-new Date(s).getTime(),m=Math.floor(d/6e4);if(m<1)return'Vừa xong';if(m<60)return m+'ph trước';const h=Math.floor(m/60);if(h<24)return h+'h trước';return Math.floor(h/24)+'ngày trước';}
+
+const statusMap={
+  prospect:{label:'Prospect',cls:'b-def'},active:{label:'Active',cls:'b-ok'},
+  expiring:{label:'Sắp hết hạn',cls:'b-warn'},cold:{label:'Cold',cls:'b-info'},churned:{label:'Churned',cls:'b-err'}
+};
+const stages={
+  new:{label:'Mới nhận',color:'#9ca3af'},
+  consulting:{label:'Tư vấn',color:'#2563eb'},
+  pending:{label:'Chờ chốt',color:'#b45309'},
+  won:{label:'Chốt',color:'#059669'},
+  lost:{label:'Lost',color:'#dc2626'}
+};
+const aColors={
+  call:'#5a67f2',message:'#059669',meeting:'#b45309',email:'#2563eb',note:'#9ca3af'
+};
+const aLabels={call:'Gọi điện',message:'Nhắn tin',meeting:'Gặp mặt',email:'Email',note:'Ghi chú'};
+const rtypes={follow_up:'Follow-up',renewal:'Gia hạn',upsell:'Upsell',custom:'Tùy chỉnh'};
+const stageBadge=s=>s==='won'?'b-ok':s==='lost'?'b-err':s==='pending'?'b-warn':'b-info';
+const members=['Hường','Sales A','Sales B'];
+
+// ── ROUTING ─────────────────────────────────────────
+let page='dashboard',detailId=null;
+function go(p,id=null){
+  page=p;detailId=id;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.p===p));
+  const titles={dashboard:'Dashboard',companies:'Công ty',pipeline:'Deal Pipeline',contracts:'Hợp đồng',reminders:'Nhắc việc',services:'Dịch vụ','co-detail':'Chi tiết công ty'};
+  document.getElementById('ptitle').textContent=titles[p]||p;
+  const mc=document.getElementById('mc');
+  if(p==='dashboard')mc.innerHTML=pgDashboard();
+  else if(p==='companies')mc.innerHTML=pgCompanies();
+  else if(p==='co-detail')mc.innerHTML=pgCoDetail(id);
+  else if(p==='pipeline'){mc.innerHTML=pgPipeline();initKanban();}
+  else if(p==='contracts')mc.innerHTML=pgContracts();
+  else if(p==='reminders')mc.innerHTML=pgReminders();
+  else if(p==='services')mc.innerHTML=pgServices();
+  updBadge();
+}
+
+// ── DASHBOARD ───────────────────────────────────────
+function pgDashboard(){
+  const cos=DB.get('companies'),deals=DB.get('deals'),kts=DB.get('contracts'),
+        rems=DB.get('reminders'),acts=DB.get('activities');
+  const openDeals=deals.filter(d=>!['won','lost'].includes(d.stage));
+  const wonDeals=deals.filter(d=>d.stage==='won');
+  const pipeVal=openDeals.reduce((s,d)=>s+(d.value||0),0);
+  const wonRev=wonDeals.reduce((s,d)=>s+(d.value||0),0);
+  const activeKt=kts.filter(k=>k.renewalStatus==='active');
+  const expKt=kts.filter(k=>k.renewalStatus==='expiring_soon');
+  const pendRem=rems.filter(r=>!r.isDone);
+  const denom=deals.filter(d=>d.stage!=='new').length;
+  const closeRate=denom>0?Math.round(wonDeals.length/denom*100):0;
+  const recActs=[...acts].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,5);
+  const upRems=rems.filter(r=>!r.isDone).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate)).slice(0,4);
+
+  return `
+  <div class="ph">
+    <div>
+      <div class="ptitle">Dashboard</div>
+      <div class="psub">${new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat blue">
+      <div class="slabel">Pipeline Value</div>
+      <div class="sval">${money(pipeVal)}<span style="font-size:12px;font-weight:500;color:var(--txm)"> đ</span></div>
+      <div class="ssub">${openDeals.length} deal đang mở</div>
+    </div>
+    <div class="stat green">
+      <div class="slabel">Doanh thu chốt</div>
+      <div class="sval">${money(wonRev)}<span style="font-size:12px;font-weight:500;color:var(--txm)"> đ</span></div>
+      <div class="ssub">Close rate: <strong>${closeRate}%</strong></div>
+    </div>
+    <div class="stat orange">
+      <div class="slabel">Hợp đồng Active</div>
+      <div class="sval">${activeKt.length}</div>
+      <div class="ssub">${expKt.length>0?expKt.length+' sắp hết hạn':'Tất cả ổn định'}</div>
+    </div>
+    <div class="stat ${pendRem.length>0?'red':'blue'}">
+      <div class="slabel">Nhắc việc chờ</div>
+      <div class="sval">${pendRem.length}</div>
+      <div class="ssub">${pendRem.length>0?'Cần xử lý':'Đã xử lý hết'}</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="sec-title">Deal theo stage</div>
+      ${Object.entries(stages).map(([s,st])=>{
+        const cnt=deals.filter(d=>d.stage===s).length;
+        const val=deals.filter(d=>d.stage===s).reduce((a,d)=>a+(d.value||0),0);
+        const pct=deals.length>0?cnt/deals.length*100:0;
+        return `<div class="prog-row">
+          <div class="prog-labels">
+            <span style="color:var(--tx2);font-weight:500">${st.label}</span>
+            <span style="color:var(--txm)">${cnt} deal &nbsp;·&nbsp; ${money(val)}đ</span>
+          </div>
+          <div class="prog-track">
+            <div style="width:${pct}%;height:100%;background:${st.color};border-radius:4px;transition:width .5s ease"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="sec-title" style="margin:0;border:none;padding:0">Nhắc việc sắp tới</div>
+        <button class="btn btn-secondary btn-sm" onclick="go('reminders')">Xem tất cả</button>
+      </div>
+      ${upRems.length===0?`<div class="empty" style="padding:20px"><div class="emtitle">Không có nhắc việc</div></div>`:
+      upRems.map(r=>{
+        const co=DB.get('companies').find(c=>c.id===r.companyId);
+        const d=daysTo(r.dueDate);
+        const uc=d<0?'b-err':d===0?'b-warn':'b-info';
+        const dl=d<0?`Quá hạn ${Math.abs(d)} ngày`:d===0?'Hôm nay':`${d} ngày tới`;
+        return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border)">
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:700;margin-bottom:2px">${co?.name||'—'}</div>
+            <div style="font-size:11px;color:var(--txm)">${r.note}</div>
+          </div>
+          <span class="badge ${uc}" style="margin-left:10px;white-space:nowrap">${dl}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-title">Hoạt động gần đây</div>
+    ${recActs.length===0?`<div class="empty" style="padding:20px"><div class="emtitle">Chưa có hoạt động nào</div></div>`:
+    recActs.map(a=>{
+      const co=DB.get('companies').find(c=>c.id===a.companyId);
+      return `<div class="aitem">
+        <div class="adot" style="background:${aColors[a.type]||aColors.note}">${(aLabels[a.type]||'N')[0]}</div>
+        <div class="acontent">
+          <div class="atext"><strong>${co?.name||'—'}</strong> &nbsp;·&nbsp; ${a.content}</div>
+          <div class="atime">${aLabels[a.type]||a.type} &nbsp;·&nbsp; ${a.createdBy} &nbsp;·&nbsp; ${timeAgo(a.createdAt)}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ── COMPANIES ───────────────────────────────────────
+function pgCompanies(search='',statusF=''){
+  let cos=DB.get('companies');
+  if(search)cos=cos.filter(c=>c.name.toLowerCase().includes(search.toLowerCase())||(c.industry||'').toLowerCase().includes(search.toLowerCase()));
+  if(statusF)cos=cos.filter(c=>c.status===statusF);
+  const deals=DB.get('deals'),kts=DB.get('contracts');
+  return `
+  <div class="ph">
+    <div><div class="ptitle">Công ty</div><div class="psub">${cos.length} công ty</div></div>
+    <button class="btn btn-primary" onclick="mAddCo()">+ Thêm công ty</button>
+  </div>
+  <div class="fbar">
+    <div class="searchbox" style="width:250px">
+      <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--txm);flex-shrink:0"><circle cx="9" cy="9" r="7"/><path d="M15 15l4 4"/></svg>
+      <input type="text" id="cosearch" placeholder="Tìm công ty..." oninput="filterCos()" value="${search}">
+    </div>
+    <select class="fc" id="costatF" onchange="filterCos()" style="width:auto">
+      <option value="">Tất cả trạng thái</option>
+      ${Object.entries(statusMap).map(([k,v])=>`<option value="${k}" ${statusF===k?'selected':''}>${v.label}</option>`).join('')}
+    </select>
+  </div>
+  <div class="twrap"><table class="tbl">
+    <thead><tr><th>TÊN CÔNG TY</th><th>NGÀNH</th><th>TRẠNG THÁI</th><th>DEALS</th><th>PHỤ TRÁCH</th><th>NGÀY TẠO</th><th></th></tr></thead>
+    <tbody>
+    ${cos.length===0?`<tr><td colspan="7"><div class="empty"><div class="emtitle">Chưa có công ty nào</div><button class="btn btn-primary" onclick="mAddCo()" style="margin-top:8px">+ Thêm ngay</button></div></td></tr>`:
+    cos.map(c=>{
+      const s=statusMap[c.status]||statusMap.prospect;
+      const dc=deals.filter(d=>d.companyId===c.id).length;
+      const hasK=kts.find(k=>k.companyId===c.id);
+      return `<tr onclick="go('co-detail','${c.id}')">
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;border-radius:8px;background:var(--accent-m);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--accent);flex-shrink:0">${c.name[0]}</div>
+            <div>
+              <div style="font-weight:700">${c.name}</div>
+              <div style="font-size:10px;color:var(--txm)">${c.size||'—'} người</div>
+            </div>
+          </div>
+        </td>
+        <td style="color:var(--tx2)">${c.industry||'—'}</td>
+        <td><span class="badge ${s.cls}">${s.label}</span></td>
+        <td>
+          <span style="font-weight:700">${dc}</span>
+          ${hasK?'<span class="badge b-ok" style="margin-left:5px;font-size:10px">HĐ</span>':''}
+        </td>
+        <td style="color:var(--tx2)">${c.assignedTo||'—'}</td>
+        <td style="color:var(--txm)">${fmtDate(c.createdAt)}</td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();mAddCo('${c.id}')">Sửa</button>
+          <button class="btn btn-danger btn-sm" style="margin-left:3px" onclick="event.stopPropagation();delCo('${c.id}')">Xóa</button>
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+function filterCos(){
+  const s=document.getElementById('cosearch')?.value||'';
+  const f=document.getElementById('costatF')?.value||'';
+  document.getElementById('mc').innerHTML=pgCompanies(s,f);
+}
+
+// ── COMPANY DETAIL ──────────────────────────────────
+function pgCoDetail(id){
+  const co=DB.get('companies').find(c=>c.id===id);
+  if(!co)return'<div class="empty"><div class="emtitle">Không tìm thấy</div></div>';
+  const cts=DB.get('contacts').filter(c=>c.companyId===id);
+  const deals=DB.get('deals').filter(d=>d.companyId===id);
+  const kts=DB.get('contracts').filter(k=>k.companyId===id);
+  const acts=DB.get('activities').filter(a=>a.companyId===id).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  const rems=DB.get('reminders').filter(r=>r.companyId===id&&!r.isDone);
+  const svcs=DB.get('services');
+  const s=statusMap[co.status]||statusMap.prospect;
+  const totVal=deals.reduce((a,d)=>a+(d.value||0),0);
+  return `
+  <div style="margin-bottom:14px"><button class="btn btn-secondary btn-sm" onclick="go('companies')">← Quay lại</button></div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:44px;height:44px;border-radius:10px;background:var(--accent-m);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--accent)">${co.name[0]}</div>
+        <div>
+          <div style="font-size:18px;font-weight:900">${co.name}</div>
+          <div style="font-size:12px;color:var(--txm)">${co.industry||''} · ${co.size||''} người · ${co.source||'—'}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:7px;align-items:center">
+        <span class="badge ${s.cls}">${s.label}</span>
+        <button class="btn btn-secondary btn-sm" onclick="mAddCo('${id}')">Sửa</button>
+        <button class="btn btn-primary btn-sm" onclick="mAddAct('${id}')">+ Ghi hoạt động</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+      <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Total Deal Value</div><div style="font-size:18px;font-weight:800">${money(totVal)}đ</div></div>
+      <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Deals</div><div style="font-size:18px;font-weight:800">${deals.length}</div></div>
+      <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Hợp đồng</div><div style="font-size:18px;font-weight:800">${kts.length}</div></div>
+      <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Phụ trách</div><div style="font-size:18px;font-weight:800">${co.assignedTo||'—'}</div></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 290px;gap:14px">
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="sec-title" style="margin:0;border:none;padding:0">Deals (${deals.length})</div>
+          <button class="btn btn-secondary btn-sm" onclick="mAddDeal('${id}')">+ Deal mới</button>
+        </div>
+        ${deals.length===0?`<div style="text-align:center;padding:18px;color:var(--txm);font-size:12px">Chưa có deal nào</div>`:
+        deals.map(d=>{
+          const svc=svcs.find(s=>s.id===d.serviceId);
+          const st=stages[d.stage]||stages.new;
+          return `<div style="display:flex;gap:10px;padding:10px;background:var(--bg3);border-radius:7px;margin-bottom:7px;cursor:pointer;border:1px solid var(--border);transition:var(--tr)" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="mDealDetail('${d.id}')">
+            <div style="flex:1">
+              <div style="font-weight:700;margin-bottom:2px">${d.title}</div>
+              <div style="font-size:11px;color:var(--accent);font-weight:600;margin-bottom:5px">${svc?.name||'—'}</div>
+              <div style="display:flex;gap:7px;align-items:center">
+                <span style="font-size:13px;font-weight:800">${money(d.value)}đ</span>
+                <span class="badge ${stageBadge(d.stage)}">${st.label}</span>
+              </div>
+            </div>
+            <div style="text-align:right;font-size:10px;color:var(--txm)">
+              <div style="font-weight:600">${d.assignedTo||'—'}</div>
+              <div style="margin-top:3px">${fmtDate(d.expectedCloseDate)}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="sec-title" style="margin:0;border:none;padding:0">Activity Log (${acts.length})</div>
+          <button class="btn btn-secondary btn-sm" onclick="mAddAct('${id}')">+ Ghi log</button>
+        </div>
+        ${acts.length===0?`<div style="text-align:center;padding:18px;color:var(--txm);font-size:12px">Chưa có hoạt động nào</div>`:
+        acts.map(a=>`<div class="aitem">
+          <div class="adot" style="background:${aColors[a.type]||aColors.note};font-size:10px;font-weight:700">${(aLabels[a.type]||'N')[0]}</div>
+          <div class="acontent">
+            <div class="atext">${a.content}</div>
+            <div class="atime">${aLabels[a.type]||a.type} · ${a.createdBy} · ${timeAgo(a.createdAt)}</div>
+          </div>
+          <button onclick="delAct('${a.id}','${id}')" style="background:none;border:none;color:var(--txm);cursor:pointer;font-size:12px;opacity:0;transition:opacity .2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">✕</button>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="sec-title" style="margin:0;border:none;padding:0">Người liên hệ</div>
+          <button class="btn btn-secondary btn-sm" onclick="mAddContact('${id}')">+</button>
+        </div>
+        ${cts.length===0?`<div style="text-align:center;padding:12px;color:var(--txm);font-size:11px">Chưa có người liên hệ</div>`:
+        cts.map(ct=>`<div style="padding:9px;background:var(--bg3);border-radius:7px;margin-bottom:7px;border:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
+            <div style="width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">${ct.name[0]}</div>
+            <div>
+              <div style="font-size:12px;font-weight:700">${ct.name} ${ct.isPrimary?'<span class="badge b-purple" style="font-size:9px">Chính</span>':''}</div>
+              <div style="font-size:10px;color:var(--txm)">${ct.role||'—'}</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--tx2);margin-bottom:1px">${ct.phone||'—'}</div>
+          <div style="font-size:10px;color:var(--tx2)">${ct.email||'—'}</div>
+        </div>`).join('')}
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="sec-title" style="margin:0;border:none;padding:0">Nhắc việc</div>
+          <button class="btn btn-secondary btn-sm" onclick="mAddRem('${id}')">+</button>
+        </div>
+        ${rems.length===0?`<div style="text-align:center;padding:12px;color:var(--txm);font-size:11px">Không có nhắc việc</div>`:
+        rems.map(r=>{
+          const d=daysTo(r.dueDate);
+          const uc=d<0?'b-err':d===0?'b-warn':'b-info';
+          return `<div style="padding:9px;background:var(--bg3);border-radius:7px;margin-bottom:7px;border:1px solid var(--border)">
+            <div style="font-size:12px;margin-bottom:5px;color:var(--tx)">${r.note}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span class="badge ${uc}" style="font-size:10px">${d<0?'Quá hạn':d===0?'Hôm nay':d+' ngày tới'}</span>
+              <button onclick="doneRem('${r.id}','${id}')" style="font-size:10px;background:var(--ok-m);color:var(--ok);border:1px solid transparent;border-radius:4px;padding:2px 8px;cursor:pointer;font-weight:600">Hoàn thành</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${kts.length>0?`<div class="card">
+        <div class="sec-title" style="margin-bottom:10px">Hợp đồng</div>
+        ${kts.map(k=>{
+          const svc=svcs.find(s=>s.id===k.serviceId);
+          const rs=k.renewalStatus;
+          const rsc=rs==='active'?'b-ok':rs==='expiring_soon'?'b-warn':rs==='churned'?'b-err':'b-def';
+          const rsl={active:'Active',expiring_soon:'Sắp hết hạn',renewed:'Đã gia hạn',churned:'Chấm dứt'}[rs]||rs;
+          return `<div style="padding:9px;background:var(--bg3);border-radius:7px;margin-bottom:7px;border:1px solid var(--border)">
+            <div style="font-size:11px;font-weight:700;margin-bottom:3px">${svc?.name||'—'}</div>
+            <div style="font-size:10px;color:var(--txm);margin-bottom:5px">${fmtDate(k.startDate)} → ${fmtDate(k.endDate)}</div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="font-weight:800;font-size:12px">${money(k.value)}đ</span>
+              <span class="badge ${rsc}" style="font-size:10px">${rsl}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`:''}
+    </div>
+  </div>`;
+}
+
+// ── PIPELINE ────────────────────────────────────────
+function pgPipeline(){
+  const deals=DB.get('deals'),cos=DB.get('companies'),svcs=DB.get('services');
+  const openVal=deals.filter(d=>!['won','lost'].includes(d.stage)).reduce((s,d)=>s+(d.value||0),0);
+  return `
+  <div class="ph">
+    <div><div class="ptitle">Deal Pipeline</div><div class="psub">${deals.filter(d=>!['won','lost'].includes(d.stage)).length} deal đang mở &nbsp;·&nbsp; ${money(openVal)}đ</div></div>
+    <button class="btn btn-primary" onclick="mAddDeal()">+ Deal mới</button>
+  </div>
+  <div class="kanban">
+    ${Object.entries(stages).map(([s,st])=>{
+      const sDeals=deals.filter(d=>d.stage===s);
+      const sVal=sDeals.reduce((a,d)=>a+(d.value||0),0);
+      return `<div class="kcol" id="col-${s}">
+        <div class="khead" style="border-top:3px solid ${st.color}">
+          <div class="ktitle">${st.label}<span class="kcount">${sDeals.length}</span></div>
+          <div class="kval">${money(sVal)}đ</div>
+        </div>
+        <div class="kcards" id="kc-${s}" ondragover="dOver(event,'${s}')" ondrop="dDrop(event,'${s}')" ondragleave="dLeave(event)">
+          ${sDeals.map(d=>{
+            const co=cos.find(c=>c.id===d.companyId);
+            const svc=svcs.find(sv=>sv.id===d.serviceId);
+            const dy=d.expectedCloseDate?daysTo(d.expectedCloseDate):null;
+            return `<div class="dcard" draggable="true" id="dc-${d.id}"
+              ondragstart="dStart(event,'${d.id}')" ondragend="dEnd(event)"
+              onclick="mDealDetail('${d.id}')">
+              <div class="dc-co">${co?.name||'—'}</div>
+              <div class="dc-svc">${svc?.name||'—'}</div>
+              <div class="dc-val">${money(d.value)}đ</div>
+              <div class="dc-meta">
+                <span>${dy!==null?(dy<0?'Quá hạn':dy===0?'Hôm nay':dy+' ngày'):'—'}</span>
+                <div class="dc-av" title="${d.assignedTo}">${(d.assignedTo||'?')[0]}</div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+let dragId=null;
+function initKanban(){}
+function dStart(e,id){dragId=id;e.dataTransfer.effectAllowed='move';setTimeout(()=>document.getElementById('dc-'+id)?.classList.add('dragging'),0);}
+function dEnd(){document.querySelectorAll('.dcard').forEach(el=>el.classList.remove('dragging'));document.querySelectorAll('.kcards').forEach(el=>el.classList.remove('drag-over'));}
+function dOver(e,s){e.preventDefault();document.getElementById('kc-'+s)?.classList.add('drag-over');}
+function dLeave(e){e.currentTarget.classList.remove('drag-over');}
+function dDrop(e,s){
+  e.preventDefault();if(!dragId)return;
+  const deals=DB.get('deals'),d=deals.find(x=>x.id===dragId);
+  if(d&&d.stage!==s){d.stage=s;d.updatedAt=now();DB.set('deals',deals);toast('ok','Chuyển sang "'+stages[s].label+'"');}
+  dragId=null;go('pipeline');
+}
+
+// ── CONTRACTS ───────────────────────────────────────
+function pgContracts(){
+  const kts=DB.get('contracts'),cos=DB.get('companies'),svcs=DB.get('services');
+  const totVal=kts.reduce((s,k)=>s+(k.value||0),0);
+  return `
+  <div class="ph">
+    <div><div class="ptitle">Hợp đồng</div><div class="psub">${kts.length} hợp đồng &nbsp;·&nbsp; ${money(totVal)}đ tổng giá trị</div></div>
+    <button class="btn btn-primary" onclick="mAddKt()">+ Tạo hợp đồng</button>
+  </div>
+  <div class="twrap"><table class="tbl">
+    <thead><tr><th>CÔNG TY</th><th>DỊCH VỤ</th><th>GIÁ TRỊ</th><th>THỜI HẠN</th><th>TRẠNG THÁI</th><th>AM</th><th></th></tr></thead>
+    <tbody>
+    ${kts.length===0?`<tr><td colspan="7"><div class="empty"><div class="emtitle">Chưa có hợp đồng nào</div><button class="btn btn-primary" onclick="mAddKt()" style="margin-top:8px">+ Tạo ngay</button></div></td></tr>`:
+    kts.map(k=>{
+      const co=cos.find(c=>c.id===k.companyId);
+      const svc=svcs.find(s=>s.id===k.serviceId);
+      const rs=k.renewalStatus;
+      const rsc=rs==='active'?'b-ok':rs==='expiring_soon'?'b-warn':rs==='churned'?'b-err':'b-def';
+      const rsl={active:'Active',expiring_soon:'Sắp hết hạn',renewed:'Đã gia hạn',churned:'Chấm dứt'}[rs]||rs;
+      const dy=k.endDate?daysTo(k.endDate):null;
+      return `<tr onclick="void(0)">
+        <td><span style="font-weight:700;cursor:pointer;color:var(--accent)" onclick="go('co-detail','${k.companyId}')">${co?.name||'—'}</span></td>
+        <td style="color:var(--tx2)">${svc?.name||'—'}</td>
+        <td style="font-weight:800">${money(k.value)}đ</td>
+        <td>
+          <div style="font-size:12px">${fmtDate(k.startDate)}</div>
+          <div style="font-size:11px;color:var(--txm)">→ ${fmtDate(k.endDate)} ${dy!==null&&dy<0?'<span style="color:var(--err);font-weight:600">Hết hạn</span>':dy!==null&&dy<=30?'<span style="color:var(--warn);font-weight:600">còn '+dy+' ngày</span>':''}</div>
+        </td>
+        <td><span class="badge ${rsc}">${rsl}</span></td>
+        <td style="color:var(--tx2)">${k.accountManager||'—'}</td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="mAddKt('${k.id}')">Sửa</button>
+          <button class="btn btn-danger btn-sm" style="margin-left:3px" onclick="delKt('${k.id}')">Xóa</button>
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+// ── REMINDERS ───────────────────────────────────────
+function pgReminders(){
+  const rems=DB.get('reminders').sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+  const cos=DB.get('companies');
+  const pend=rems.filter(r=>!r.isDone);
+  return `
+  <div class="ph">
+    <div><div class="ptitle">Nhắc việc</div><div class="psub">${pend.length} đang chờ &nbsp;·&nbsp; ${rems.filter(r=>r.isDone).length} đã xong</div></div>
+    <button class="btn btn-primary" onclick="mAddRem()">+ Thêm nhắc</button>
+  </div>
+  ${rems.length===0?`<div class="empty"><div class="emtitle">Không có nhắc việc nào</div><div class="emtext">Tạo nhắc việc để không bỏ lỡ follow-up quan trọng</div><button class="btn btn-primary" onclick="mAddRem()">+ Tạo nhắc</button></div>`:`
+  <div class="twrap"><table class="tbl">
+    <thead><tr><th>LOẠI</th><th>CÔNG TY</th><th>NỘI DUNG</th><th>DUE DATE</th><th>PHÂN CÔNG</th><th></th></tr></thead>
+    <tbody>
+    ${rems.map(r=>{
+      const co=cos.find(c=>c.id===r.companyId);
+      const d=daysTo(r.dueDate);
+      const uc=r.isDone?'b-def':d<0?'b-err':d===0?'b-warn':'b-info';
+      const dl=r.isDone?'Hoàn thành':d<0?`Quá hạn ${Math.abs(d)} ngày`:d===0?'Hôm nay':`${d} ngày tới`;
+      return `<tr style="${r.isDone?'opacity:.4':''}">
+        <td><span class="badge b-def">${rtypes[r.type]||r.type}</span></td>
+        <td><span style="font-weight:700;cursor:pointer;color:var(--accent)" onclick="go('co-detail','${r.companyId}')">${co?.name||'—'}</span></td>
+        <td style="max-width:280px;font-size:12px;color:var(--tx2)">${r.note||'—'}</td>
+        <td><span class="badge ${uc}">${dl}</span></td>
+        <td style="color:var(--tx2)">${r.assignedTo||'—'}</td>
+        <td>
+          ${!r.isDone?`<button class="btn btn-ok btn-sm" onclick="doneRem('${r.id}')">Hoàn thành</button>`:''}
+          <button class="btn btn-danger btn-sm" style="margin-left:3px" onclick="delRem('${r.id}')">Xóa</button>
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table></div>`}`;
+}
+
+// ── SERVICES ────────────────────────────────────────
+function pgServices(){
+  const svcs=DB.get('services'),deals=DB.get('deals');
+  const catC={marketing:'b-purple',sales:'b-info',operations:'b-ok'};
+  return `
+  <div class="ph">
+    <div><div class="ptitle">Danh mục dịch vụ</div><div class="psub">${svcs.length} dịch vụ</div></div>
+    <button class="btn btn-primary" onclick="mAddSvc()">+ Thêm dịch vụ</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+    ${svcs.length===0?`<div class="empty" style="grid-column:1/-1"><div class="emtitle">Chưa có dịch vụ nào</div><button class="btn btn-primary" onclick="mAddSvc()" style="margin-top:8px">+ Thêm ngay</button></div>`:
+    svcs.map(s=>{
+      const wonV=deals.filter(d=>d.serviceId===s.id&&d.stage==='won').reduce((a,d)=>a+(d.value||0),0);
+      const cnt=deals.filter(d=>d.serviceId===s.id).length;
+      return `<div class="card" style="transition:var(--tr)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 20px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:5px">${s.name}</div>
+            <span class="badge ${catC[s.category]||'b-def'}" style="font-size:10px">${s.category}</span>
+          </div>
+          <div style="display:flex;gap:3px">
+            <button class="btn btn-secondary btn-sm" onclick="mAddSvc('${s.id}')">Sửa</button>
+            <button class="btn btn-danger btn-sm" onclick="delSvc('${s.id}')">Xóa</button>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--txm);margin-bottom:14px;line-height:1.6">${s.description||'—'}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;padding-top:10px;border-top:1px solid var(--border)">
+          <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase">Giá</div><div style="font-size:12px;font-weight:800">${money(s.basePrice)}đ</div></div>
+          <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase">Thời hạn</div><div style="font-size:12px;font-weight:800">${s.durationMonths||'—'} tháng</div></div>
+          <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase">Doanh thu</div><div style="font-size:12px;font-weight:800">${money(wonV)}đ</div></div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ── MODALS ──────────────────────────────────────────
+function openM(title,body,wide=false){
+  document.getElementById('mtitle').textContent=title;
+  document.getElementById('mbody').innerHTML=body;
+  document.getElementById('mbox').className='mbox'+(wide?' wide':'');
+  document.getElementById('mo').classList.add('open');
+}
+function closeMo(e){if(e&&e.target!==document.getElementById('mo'))return;document.getElementById('mo').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('mo').classList.remove('open');});
+
+function mAddCo(id=null){
+  const c=id?DB.get('companies').find(x=>x.id===id):null;
+  openM(c?'Sửa công ty':'Thêm công ty mới',`
+    <div class="frow">
+      <div class="fg"><label class="flabel">Tên công ty *</label><input class="fc" id="f-n" value="${c?.name||''}" placeholder="BYEALCO"></div>
+      <div class="fg"><label class="flabel">Ngành</label><input class="fc" id="f-ind" value="${c?.industry||''}" placeholder="Fashion & Beauty"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flabel">Quy mô</label><select class="fc" id="f-sz">${['1-10','10-50','50-200','200+'].map(s=>`<option ${c?.size===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="fg"><label class="flabel">Nguồn</label><select class="fc" id="f-src">${['Referral','Facebook','Zalo','Cold outreach','Event','Khác'].map(s=>`<option ${c?.source===s?'selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flabel">Trạng thái</label><select class="fc" id="f-st">${Object.entries(statusMap).map(([k,v])=>`<option value="${k}" ${c?.status===k?'selected':''}>${v.label}</option>`).join('')}</select></div>
+      <div class="fg"><label class="flabel">Phụ trách</label><select class="fc" id="f-as">${members.map(m=>`<option ${c?.assignedTo===m?'selected':''}>${m}</option>`).join('')}</select></div>
+    </div>
+    <div class="fact">
+      <button class="btn btn-secondary" onclick="closeMo()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveCo('${id||''}')">Lưu</button>
+    </div>`);
+}
+function saveCo(id){
+  const n=document.getElementById('f-n').value.trim();
+  if(!n){toast('err','Tên không được trống');return;}
+  const cos=DB.get('companies');
+  const data={name:n,industry:document.getElementById('f-ind').value,size:document.getElementById('f-sz').value,source:document.getElementById('f-src').value,status:document.getElementById('f-st').value,assignedTo:document.getElementById('f-as').value};
+  if(id){const i=cos.findIndex(c=>c.id===id);if(i>=0)Object.assign(cos[i],data,{updatedAt:now()});}
+  else cos.push({id:DB.id(),...data,tags:[],createdAt:now()});
+  DB.set('companies',cos);
+  document.getElementById('mo').classList.remove('open');
+  toast('ok',id?'Đã cập nhật công ty':'Đã thêm công ty mới');
+  go(page,detailId);
+}
+function delCo(id){if(!confirm('Xóa công ty này?'))return;DB.set('companies',DB.get('companies').filter(c=>c.id!==id));toast('ok','Đã xóa');go('companies');}
+
+function mAddContact(cid){
+  openM('Thêm người liên hệ',`
+    <div class="frow">
+      <div class="fg"><label class="flabel">Tên *</label><input class="fc" id="f-n" placeholder="Nguyễn Văn A"></div>
+      <div class="fg"><label class="flabel">Chức danh</label><input class="fc" id="f-r" placeholder="CEO / Manager"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flabel">SĐT</label><input class="fc" id="f-p" placeholder="09xxxxxxxx"></div>
+      <div class="fg"><label class="flabel">Email</label><input class="fc" id="f-e" type="email" placeholder="name@co.com"></div>
+    </div>
+    <label style="display:flex;align-items:center;gap:7px;cursor:pointer;margin-bottom:4px">
+      <input type="checkbox" id="f-prim"> <span class="flabel" style="margin:0">Người quyết định chính</span>
+    </label>
+    <div class="fact">
+      <button class="btn btn-secondary" onclick="closeMo()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveCt('${cid}')">Lưu</button>
+    </div>`);
+}
+function saveCt(cid){
+  const n=document.getElementById('f-n').value.trim();
+  if(!n){toast('err','Tên không được trống');return;}
+  const cts=DB.get('contacts');
+  cts.push({id:DB.id(),companyId:cid,name:n,role:document.getElementById('f-r').value,phone:document.getElementById('f-p').value,email:document.getElementById('f-e').value,isPrimary:document.getElementById('f-prim').checked,createdAt:now()});
+  DB.set('contacts',cts);document.getElementById('mo').classList.remove('open');
+  toast('ok','Đã thêm người liên hệ');go('co-detail',cid);
+}
+
+function mAddDeal(cid=null){
+  const cos=DB.get('companies'),svcs=DB.get('services');
+  openM('Thêm Deal mới',`
+    <div class="fg"><label class="flabel">Tiêu đề *</label><input class="fc" id="f-t" placeholder="TikTok Growth Q2/2026"></div>
+    <div class="frow">
+      <div class="fg"><label class="flabel">Công ty *</label><select class="fc" id="f-co">${cos.map(c=>`<option value="${c.id}" ${cid===c.id?'selected':''}>${c.name}</option>`).join('')}</select></div>
+      <div class="fg"><label class="flabel">Dịch vụ</label><select class="fc" id="f-sv"><option value="">— Chọn dịch vụ —</option>${svcs.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flabel">Giá trị (VND)</label><input class="fc" id="f-v" type="number" placeholder="15000000"></div>
+      <div class="fg"><label class="flabel">Stage</label><select class="fc" id="f-st">${Object.entries(stages).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('')}</select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flabel">Dự kiến chốt</label><input class="fc" id="f-cl" type="date"></div>
+      <div class="fg"><label class="flabel">Phụ trách</label><select class="fc" id="f-as">${members.map(m=>`<option>${m}</option>`).join('')}</select></div>
+    </div>
+    <div class="fact">
+      <button class="btn btn-secondary" onclick="closeMo()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveDeal()">Lưu</button>
+    </div>`);
+}
+function saveDeal(){
+  const t=document.getElementById('f-t').value.trim(),cid=document.getElementById('f-co').value;
+  if(!t||!cid){toast('err','Vui lòng điền đủ thông tin');return;}
+  const deals=DB.get('deals');
+  deals.push({id:DB.id(),companyId:cid,serviceId:document.getElementById('f-sv').value,title:t,value:parseInt(document.getElementById('f-v').value)||0,stage:document.getElementById('f-st').value,assignedTo:document.getElementById('f-as').value,expectedCloseDate:document.getElementById('f-cl').value,lostReason:'',createdAt:now()});
+  DB.set('deals',deals);document.getElementById('mo').classList.remove('open');
+  toast('ok','Đã tạo deal mới');go(page,detailId);
+}
+function mDealDetail(id){
+  const d=DB.get('deals').find(x=>x.id===id);if(!d)return;
+  const co=DB.get('companies').find(c=>c.id===d.companyId);
+  const svc=DB.get('services').find(s=>s.id===d.serviceId);
+  const st=stages[d.stage]||stages.new;
+  openM('Chi tiết deal',`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+      <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase;margin-bottom:3px">Tiêu đề</div><div style="font-weight:700">${d.title}</div></div>
+      <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase;margin-bottom:3px">Công ty</div><div style="font-weight:700">${co?.name||'—'}</div></div>
+      <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase;margin-bottom:3px">Dịch vụ</div><div style="font-weight:600;color:var(--accent)">${svc?.name||'—'}</div></div>
+      <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase;margin-bottom:3px">Giá trị</div><div style="font-size:18px;font-weight:900">${money(d.value)}đ</div></div>
+      <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase;margin-bottom:3px">Stage</div><span class="badge ${stageBadge(d.stage)}">${st.label}</span></div>
+      <div><div style="font-size:10px;color:var(--txm);font-weight:700;text-transform:uppercase;margin-bottom:3px">Phụ trách</div><div style="font-weight:600">${d.assignedTo||'—'}</div></div>
+    </div>
+    <div class="fg"><label class="flabel">Chuyển stage</label>
+      <select class="fc" onchange="moveStage('${id}',this.value)">
+        ${Object.entries(stages).map(([k,v])=>`<option value="${k}" ${d.stage===k?'selected':''}>${v.label}</option>`).join('')}
+      </select>
+    </div>
+    ${d.stage==='won'?`<button class="btn btn-ok" style="width:100%;margin-top:8px" onclick="convKt('${id}')">Tạo hợp đồng từ deal này</button>`:''}
+    <div class="fact"><button class="btn btn-secondary" onclick="closeMo()">Đóng</button></div>`);
+}
+function moveStage(id,s){
+  const deals=DB.get('deals'),d=deals.find(x=>x.id===id);
+  if(d){d.stage=s;d.updatedAt=now();DB.set('deals',deals);}
+  document.getElementById('mo').classList.remove('open');
+  toast('ok','Chuyển sang "'+stages[s].label+'"');go(page,detailId);
+}
+
+function mAddAct(cid){
+  openM('Ghi hoạt động',`
+    <div class="fg"><label class="flabel">Loại hoạt động</label>
+      <select class="fc" id="f-tp">
+        ${Object.entries(aLabels).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}
+      </select>
+    </div>
+    <div class="fg"><label class="flabel">Nội dung *</label><textarea class="fc" id="f-c" rows="4" placeholder="Mô tả chi tiết nội dung trao đổi..."></textarea></div>
+    <div class="fg"><label class="flabel">Người thực hiện</label><select class="fc" id="f-by">${members.map(m=>`<option>${m}</option>`).join('')}</select></div>
+    <div class="fact">
+      <button class="btn btn-secondary" onclick="closeMo()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveAct('${cid}')">Lưu</button>
+    </div>`);
+}
+function saveAct(cid){
+  const c=document.getElementById('f-c').value.trim();
+  if(!c){toast('err','Vui lòng nhập nội dung');return;}
+  const acts=DB.get('activities');
+  acts.push({id:DB.id(),companyId:cid,dealId:'',contractId:'',type:document.getElementById('f-tp').value,content:c,createdAt:now(),createdBy:document.getElementById('f-by').value});
+  DB.set('activities',acts);document.getElementById('mo').classList.remove('open');
+  toast('ok','Đã ghi hoạt động');go(page,detailId);
+}
+function delAct(id,cid){DB.set('activities',DB.get('activities').filter(a=>a.id!==id));toast('ok','Đã xóa');go('co-detail',cid);}
+
+function mAddRem(cid=null){
+  const cos=DB.get('companies');
+  const tom=fd(new Date(Date.now()+864e5));
+  openM('Thêm nhắc việc',`
+    <div class="frow">
+      <div class="fg"><label class="flabel">Công ty *</label><select class="fc" id="f-co">${cos.map(c=>`<option value="${c.id}" ${cid===c.id?'selected':''}>${c.name}</option>`).join('')}</select></div>
+      <div class="fg"><label class="flabel">Loại nhắc</label><select class="fc" id="f-tp">${Object.entries(rtypes).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flabel">Ngày nhắc *</label><input class="fc" id="f-d" type="date" value="${tom}"></div>
+      <div class="fg"><label class="flabel">Phân công</label><select class="fc" id="f-as">${members.map(m=>`<option>${m}</option>`).join('')}</select></div>
+    </div>
+    <div class="fg"><label class="flabel">Nội dung</label><textarea class="fc" id="f-n" rows="3" placeholder="Việc cần làm..."></textarea></div>
+    <div class="fact">
+      <button class="btn btn-secondary" onclick="closeMo()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveRem()">Lưu</button>
+    </div>`);
+}
+function saveRem(){
+  const cid=document.getElementById('f-co').value,d=document.getElementById('f-d').value;
+  if(!cid||!d){toast('err','Vui lòng điền đủ thông tin');return;}
+  const rems=DB.get('reminders');
+  rems.push({id:DB.id(),companyId:cid,dealId:'',contractId:'',type:document.getElementById('f-tp').value,dueDate:d,note:document.getElementById('f-n').value,isDone:false,assignedTo:document.getElementById('f-as').value});
+  DB.set('reminders',rems);document.getElementById('mo').classList.remove('open');
+  toast('ok','Đã tạo nhắc việc');updBadge();go(page,detailId);
+}
+function doneRem(id,cid=null){
+  const rems=DB.get('reminders'),r=rems.find(x=>x.id===id);
+  if(r)r.isDone=true;
+  DB.set('reminders',rems);toast('ok','Đã đánh dấu hoàn thành');updBadge();go(page,detailId||cid);
+}
+function delRem(id){DB.set('reminders',DB.get('reminders').filter(r=>r.id!==id));toast('ok','Đã xóa');updBadge();go(page,detailId);}
+
+function mAddKt(id=null){
+  const k=id?DB.get('contracts').find(x=>x.id===id):null;
+  const cos=DB.get('companies'),svcs=DB.get('services');
+  openM(k?'Sửa hợp đồng':'Tạo hợp đồng mới',`
+    <div class="frow">
+      <div class="fg"><label class="flabel">Công ty *</label><select class="fc" id="f-co">${cos.map(c=>`<option value="${c.id}" ${k?.companyId===c.id?'selected':''}>${c.name}</option>`).join('')}</select></div>
+      <div class="fg"><label class="flabel">Dịch vụ</label><select class="fc" id="f-sv">${svcs.map(s=>`<option value="${s.id}" ${k?.serviceId===s.id?'selected':''}>${s.name}</option>`).join('')}</select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flabel">Ngày bắt đầu *</label><input class="fc" id="f-s" type="date" value="${k?.startDate||''}"></div>
+      <div class="fg"><label class="flabel">Ngày kết thúc *</label><input class="fc" id="f-e" type="date" value="${k?.endDate||''}"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="flabel">Giá trị (VND)</label><input class="fc" id="f-v" type="number" value="${k?.value||''}" placeholder="15000000"></div>
+      <div class="fg"><label class="flabel">Trạng thái</label><select class="fc" id="f-st">
+        <option value="active" ${k?.renewalStatus==='active'?'selected':''}>Active</option>
+        <option value="expiring_soon" ${k?.renewalStatus==='expiring_soon'?'selected':''}>Sắp hết hạn</option>
+        <option value="renewed" ${k?.renewalStatus==='renewed'?'selected':''}>Đã gia hạn</option>
+        <option value="churned" ${k?.renewalStatus==='churned'?'selected':''}>Chấm dứt</option>
+      </select></div>
+    </div>
+    <div class="fg"><label class="flabel">Account Manager</label><select class="fc" id="f-am">${members.map(m=>`<option ${k?.accountManager===m?'selected':''}>${m}</option>`).join('')}</select></div>
+    <div class="fg"><label class="flabel">Ghi chú</label><textarea class="fc" id="f-n" rows="2">${k?.notes||''}</textarea></div>
+    <div class="fact">
+      <button class="btn btn-secondary" onclick="closeMo()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveKt('${id||''}')">Lưu</button>
+    </div>`);
+}
+function saveKt(id){
+  const cid=document.getElementById('f-co').value,s=document.getElementById('f-s').value,e=document.getElementById('f-e').value;
+  if(!cid||!s||!e){toast('err','Vui lòng điền đủ thông tin bắt buộc');return;}
+  const kts=DB.get('contracts');
+  const data={companyId:cid,serviceId:document.getElementById('f-sv').value,value:parseInt(document.getElementById('f-v').value)||0,startDate:s,endDate:e,renewalStatus:document.getElementById('f-st').value,accountManager:document.getElementById('f-am').value,notes:document.getElementById('f-n').value};
+  if(id){const i=kts.findIndex(k=>k.id===id);if(i>=0)Object.assign(kts[i],data);}
+  else kts.push({id:DB.id(),dealId:'',...data,createdAt:now()});
+  DB.set('contracts',kts);document.getElementById('mo').classList.remove('open');
+  toast('ok',id?'Đã cập nhật hợp đồng':'Đã tạo hợp đồng mới');go(page,detailId);
+}
+function delKt(id){if(!confirm('Xóa hợp đồng này?'))return;DB.set('contracts',DB.get('contracts').filter(k=>k.id!==id));toast('ok','Đã xóa');go('contracts');}
+function convKt(dealId){
+  const d=DB.get('deals').find(x=>x.id===dealId);if(!d)return;
+  document.getElementById('mo').classList.remove('open');
+  mAddKt();
+  setTimeout(()=>{
+    const fc=document.getElementById('f-co');if(fc)fc.value=d.companyId;
+    const fs=document.getElementById('f-sv');if(fs)fs.value=d.serviceId;
+    const fv=document.getElementById('f-v');if(fv)fv.value=d.value;
+    const today=fd(new Date());document.getElementById('f-s').value=today;
+    const svc=DB.get('services').find(s=>s.id===d.serviceId);
+    if(svc?.durationMonths){const end=new Date();end.setMonth(end.getMonth()+svc.durationMonths);document.getElementById('f-e').value=fd(end);}
+  },100);
+}
+
+function mAddSvc(id=null){
+  const s=id?DB.get('services').find(x=>x.id===id):null;
+  openM(s?'Sửa dịch vụ':'Thêm dịch vụ mới',`
+    <div class="fg"><label class="flabel">Tên dịch vụ *</label><input class="fc" id="f-n" value="${s?.name||''}" placeholder="TikTok Growth Partner"></div>
+    <div class="frow">
+      <div class="fg"><label class="flabel">Danh mục</label><select class="fc" id="f-cat">
+        <option value="marketing" ${s?.category==='marketing'?'selected':''}>Marketing</option>
+        <option value="sales" ${s?.category==='sales'?'selected':''}>Sales</option>
+        <option value="operations" ${s?.category==='operations'?'selected':''}>Operations</option>
+      </select></div>
+      <div class="fg"><label class="flabel">Thời hạn HĐ (tháng)</label><input class="fc" id="f-dur" type="number" value="${s?.durationMonths||1}" min="1"></div>
+    </div>
+    <div class="fg"><label class="flabel">Giá cơ bản (VND)</label><input class="fc" id="f-p" type="number" value="${s?.basePrice||''}" placeholder="15000000"></div>
+    <div class="fg"><label class="flabel">Mô tả</label><textarea class="fc" id="f-d" rows="3">${s?.description||''}</textarea></div>
+    <div class="fact">
+      <button class="btn btn-secondary" onclick="closeMo()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveSvc('${id||''}')">Lưu</button>
+    </div>`);
+}
+function saveSvc(id){
+  const n=document.getElementById('f-n').value.trim();
+  if(!n){toast('err','Tên dịch vụ không được trống');return;}
+  const svcs=DB.get('services');
+  const data={name:n,category:document.getElementById('f-cat').value,durationMonths:parseInt(document.getElementById('f-dur').value)||1,basePrice:parseInt(document.getElementById('f-p').value)||0,description:document.getElementById('f-d').value};
+  if(id){const i=svcs.findIndex(s=>s.id===id);if(i>=0)Object.assign(svcs[i],data);}
+  else svcs.push({id:DB.id(),...data});
+  DB.set('services',svcs);document.getElementById('mo').classList.remove('open');
+  toast('ok',id?'Đã cập nhật dịch vụ':'Đã thêm dịch vụ mới');go('services');
+}
+function delSvc(id){if(!confirm('Xóa dịch vụ này?'))return;DB.set('services',DB.get('services').filter(s=>s.id!==id));toast('ok','Đã xóa');go('services');}
+
+// ── SEARCH ──────────────────────────────────────────
+function gSearch(v){
+  if(!v.trim())return;
+  go('companies');
+  setTimeout(()=>{const si=document.getElementById('cosearch');if(si){si.value=v;filterCos();}},80);
+}
+
+// ── TOAST ───────────────────────────────────────────
+function toast(type,msg){
+  const labels={ok:'OK',err:'Lỗi',info:'Info'};
+  const el=document.createElement('div');
+  el.className='toast '+type;
+  el.innerHTML=`<span class="t-${type}">${labels[type]||''}</span><span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(),3000);
+}
+
+// ── BADGE ───────────────────────────────────────────
+function updBadge(){
+  const n=DB.get('reminders').filter(r=>!r.isDone).length;
+  const b=document.getElementById('rbadge');
+  if(n>0){b.style.display='inline-block';b.textContent=n;}
+  else b.style.display='none';
+}
+
+// ── INIT ────────────────────────────────────────────
+seed();
+updBadge();
+go('dashboard');
+</script>
+</body>
+</html>

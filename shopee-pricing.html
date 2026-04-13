@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gói Dịch Vụ Shopee — XSTREAM Agency</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#f5f7ff;color:#1a1d2e;min-height:100vh;padding:60px 20px}
+
+    /* HEADER */
+    .header{text-align:center;margin-bottom:56px}
+    .header-label{display:inline-block;background:#fff0e6;color:#f97316;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:16px}
+    .header h1{font-size:38px;font-weight:900;letter-spacing:-1.2px;margin-bottom:12px;color:#0f172a}
+    .header h1 span{color:#ee4d2d}
+    .header p{font-size:15px;color:#64748b;max-width:520px;margin:0 auto;line-height:1.7}
+
+    /* GRID */
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;max-width:1020px;margin:0 auto;align-items:start}
+
+    /* CARD */
+    .card{background:#fff;border-radius:20px;padding:32px 28px 28px;border:2px solid #e8ecf5;position:relative;transition:transform .2s ease,box-shadow .2s ease}
+    .card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.10)}
+    .card.featured{border-color:#ee4d2d;background:#fff;box-shadow:0 8px 32px rgba(238,77,45,.15);transform:scale(1.03)}
+    .card.featured:hover{transform:scale(1.03) translateY(-4px);box-shadow:0 20px 60px rgba(238,77,45,.20)}
+
+    /* BADGE */
+    .badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ee4d2d,#f97316);color:#fff;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:5px 18px;border-radius:20px;white-space:nowrap;box-shadow:0 4px 12px rgba(238,77,45,.4)}
+
+    /* ICON */
+    .icon-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+    .icon-wrap.blue{background:#eff6ff}
+    .icon-wrap.orange{background:#fff7ed}
+    .icon-wrap.purple{background:#faf5ff}
+    .icon-wrap svg{width:26px;height:26px}
+
+    /* PLAN INFO */
+    .plan-name{font-size:20px;font-weight:800;color:#0f172a;margin-bottom:4px}
+    .plan-sub{font-size:12px;color:#94a3b8;margin-bottom:18px;font-weight:500}
+    .plan-price{font-size:34px;font-weight:900;letter-spacing:-1.5px;margin-bottom:4px}
+    .plan-price.blue{color:#2563eb}
+    .plan-price.orange{color:#ee4d2d}
+    .plan-price.purple{color:#7c3aed}
+    .plan-price span{font-size:14px;font-weight:500;color:#94a3b8;letter-spacing:0}
+    .plan-duration{display:flex;align-items:center;gap:5px;font-size:12px;color:#64748b;margin-bottom:22px;font-weight:500}
+    .plan-duration svg{width:13px;height:13px;color:#94a3b8}
+
+    /* DIVIDER */
+    .divider{height:1px;background:#f1f5f9;margin-bottom:22px}
+
+    /* FEATURES */
+    .features{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:28px}
+    .features li{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:#374151;line-height:1.5}
+    .features li .check{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .check.blue{background:#dbeafe}
+    .check.orange{background:#ffedd5}
+    .check.purple{background:#ede9fe}
+    .check.blue svg{stroke:#2563eb}
+    .check.orange svg{stroke:#ee4d2d}
+    .check.purple svg{stroke:#7c3aed}
+    .features li .check svg{width:10px;height:10px;stroke-width:3;fill:none}
+    .feat-bold{font-weight:700;color:#0f172a}
+    .feat-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;margin-left:4px;vertical-align:middle}
+
+    /* SECTION GROUP */
+    .feat-section{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#94a3b8;margin-top:14px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px dashed #e8ecf5}
+
+    /* CTA */
+    .cta{display:block;text-align:center;padding:13px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s ease;border:none}
+    .cta.blue{background:#eff6ff;color:#2563eb;border:2px solid #dbeafe}
+    .cta.blue:hover{background:#2563eb;color:#fff}
+    .cta.orange{background:linear-gradient(135deg,#ee4d2d,#f97316);color:#fff;box-shadow:0 4px 16px rgba(238,77,45,.35)}
+    .cta.orange:hover{box-shadow:0 8px 28px rgba(238,77,45,.5);transform:translateY(-1px)}
+    .cta.purple{background:#faf5ff;color:#7c3aed;border:2px solid #ede9fe}
+    .cta.purple:hover{background:#7c3aed;color:#fff}
+
+    /* NOTE */
+    .note{text-align:center;margin-top:40px;font-size:12px;color:#94a3b8;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.8}
+    .note strong{color:#64748b}
+
+    /* ADD-ON */
+    .addon-section{max-width:1020px;margin:48px auto 0;background:#fff;border-radius:20px;padding:32px;border:1px solid #e8ecf5}
+    .addon-title{font-size:16px;font-weight:800;margin-bottom:6px;color:#0f172a}
+    .addon-sub{font-size:12px;color:#94a3b8;margin-bottom:22px}
+    .addon-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .addon-item{background:#f8faff;border:1px solid #e8ecf5;border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+    .addon-name{font-size:13px;font-weight:600;color:#374151}
+    .addon-desc{font-size:11px;color:#94a3b8;margin-top:2px}
+    .addon-price{font-size:13px;font-weight:800;color:#ee4d2d;white-space:nowrap}
+
+    @media(max-width:768px){
+      .grid{grid-template-columns:1fr}
+      .card.featured{transform:none}
+      .addon-grid{grid-template-columns:1fr}
+      .header h1{font-size:28px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-label">Dịch vụ Shopee</div>
+  <h1>Gói Dịch Vụ <span>Shopee</span> Agency</h1>
+  <p>Chọn gói phù hợp với quy mô và mục tiêu tăng trưởng của brand. Mỗi gói đều có cam kết kết quả và dashboard theo dõi real-time.</p>
+</div>
+
+<!-- PRICING GRID -->
+<div class="grid">
+
+  <!-- GÓI 1: KICKSTART -->
+  <div class="card">
+    <div class="icon-wrap blue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <div class="plan-name">Shopee Kickstart</div>
+    <div class="plan-sub">Setup nền tảng — bắt đầu đúng</div>
+    <div class="plan-price blue">8.000.000 <span>VNĐ</span></div>
+    <div class="plan-duration">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Thực hiện trong 7–15 ngày &nbsp;·&nbsp; 1 lần
+    </div>
+    <div class="divider"></div>
+
+    <div class="feat-section">Khởi tạo gian hàng</div>
+    <ul class="features">
+      <li><span class="check blue"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Tư vấn pháp lý, đăng ký tài khoản, đơn vị vận chuyển, địa chỉ kho</span></li>
+      <li><span class="check blue"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Trang trí shop, sắp xếp danh mục chuẩn Shopee Mall</span></li>
+      <li><span class="check blue"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Xây dựng bộ mã SKU, phân loại hàng hoá tiêu chuẩn</span></li>
+    </ul>
+
+    <div class="feat-section">Tối ưu nội dung SEO</div>
+    <ul class="features">
+      <li><span class="check blue"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Xây dựng bộ từ khoá chuẩn SEO Shopee cho <span class="feat-bold">20 sản phẩm</span></span></li>
+      <li><span class="check blue"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Tối ưu title, mô tả, hashtag nội dung sản phẩm</span></li>
+      <li><span class="check blue"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Tối ưu kích thước hình ảnh theo chuẩn SEO sàn</span></li>
+      <li><span class="check blue"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Thiết kế <span class="feat-bold">2 banner</span> tổng và hình ảnh đại diện sản phẩm</span></li>
+    </ul>
+
+    <div class="feat-section">Bàn giao & Hậu mãi</div>
+    <ul class="features">
+      <li><span class="check blue"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>SOP vận hành bàn giao để brand tự quản lý</span></li>
+      <li><span class="check blue"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Hỗ trợ kỹ thuật <span class="feat-bold">miễn phí 3 tháng</span> sau bàn giao</span></li>
+    </ul>
+
+    <a href="#" class="cta blue">Chọn gói này</a>
+  </div>
+
+
+  <!-- GÓI 2: GROWTH PARTNER (FEATURED) -->
+  <div class="card featured">
+    <div class="badge">Phổ biến nhất</div>
+    <div class="icon-wrap orange">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#ee4d2d" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    <div class="plan-name">Shopee Growth Partner</div>
+    <div class="plan-sub">Vận hành & tăng trưởng bền vững</div>
+    <div class="plan-price orange">15.000.000 <span>VNĐ / tháng</span></div>
+    <div class="plan-duration">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Tối thiểu 3 tháng &nbsp;·&nbsp; Gia hạn linh hoạt
+    </div>
+    <div class="divider"></div>
+
+    <div class="feat-section">Bao gồm toàn bộ Kickstart, cộng thêm</div>
+    <ul class="features">
+      <li><span class="check orange"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Tối ưu listing liên tục <span class="feat-bold">upto 50 sản phẩm</span> theo từng tuần</span></li>
+      <li><span class="check orange"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Thiết kế <span class="feat-bold">5 banner</span> campaign + hình ảnh đại diện</span></li>
+    </ul>
+
+    <div class="feat-section">Quảng cáo & Campaign</div>
+    <ul class="features">
+      <li><span class="check orange"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Setup & tối ưu <span class="feat-bold">Shopee Ads</span> (Tìm kiếm + Discovery)</span></li>
+      <li><span class="check orange"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Lên kế hoạch campaign theo lịch Shopee (9/9, 10/10...)</span></li>
+      <li><span class="check orange"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Setup Flash Sale, Voucher cửa hàng, Freeship Xtra</span></li>
+      <li><span class="check orange"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Hỗ trợ nhà bán hàng <span class="feat-bold">miễn phí 2 năm</span></span></li>
+    </ul>
+
+    <div class="feat-section">Báo cáo & Minh bạch</div>
+    <ul class="features">
+      <li><span class="check orange"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span><span class="feat-bold">Dashboard real-time</span> — brand tự xem GMV, conversion mỗi ngày</span></li>
+      <li><span class="check orange"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Weekly report mỗi thứ Hai — số liệu + phân tích</span></li>
+      <li><span class="check orange"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Monthly Strategy Session — review & kế hoạch tháng tiếp theo</span></li>
+      <li><span class="check orange"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>SLA phản hồi <span class="feat-bold">trong vòng 4 giờ</span> làm việc</span></li>
+    </ul>
+
+    <a href="#" class="cta orange">Chọn gói này</a>
+  </div>
+
+
+  <!-- GÓI 3: SCALE COMMANDER -->
+  <div class="card">
+    <div class="icon-wrap purple">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    </div>
+    <div class="plan-name">Shopee Scale Commander</div>
+    <div class="plan-sub">Cam kết GMV — Partner chiến lược</div>
+    <div class="plan-price purple">25.000.000 <span>VNĐ / tháng</span></div>
+    <div class="plan-duration">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      6 tháng &nbsp;·&nbsp; + % GMV khi vượt target
+    </div>
+    <div class="divider"></div>
+
+    <div class="feat-section">Bao gồm toàn bộ Growth Partner, cộng thêm</div>
+    <ul class="features">
+      <li><span class="check purple"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Quản lý <span class="feat-bold">upto 100 sản phẩm</span> — tối ưu toàn bộ listing</span></li>
+      <li><span class="check purple"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Thiết kế <span class="feat-bold">10 banner</span> campaign + toàn bộ visual assets</span></li>
+      <li><span class="check purple"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span><span class="feat-bold">Dedicated Account Manager</span> — 1 AM chỉ phụ trách duy nhất project của bạn</span></li>
+    </ul>
+
+    <div class="feat-section">Scale & Mở rộng</div>
+    <ul class="features">
+      <li><span class="check purple"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span><span class="feat-bold">Cam kết GMV theo tháng</span> — lộ trình 6 tháng dựa trên data</span></li>
+      <li><span class="check purple"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Booking KOC/Affiliate Shopee — tăng trưởng follower shop</span></li>
+      <li><span class="check purple"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Kết nối đa kênh: Shopee + TikTok Shop + Web thành phễu nhất quán</span></li>
+      <li><span class="check purple"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Phân tích cạnh tranh hàng tuần — phát hiện cơ hội thị trường</span></li>
+      <li><span class="check purple"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Hỗ trợ vận hành đến <span class="feat-bold">50 đơn đầu miễn phí</span> (khách hàng nạp quảng cáo)</span></li>
+    </ul>
+
+    <div class="feat-section">Cam kết & Bảo đảm</div>
+    <ul class="features">
+      <li><span class="check purple"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>SLA phản hồi <span class="feat-bold">trong vòng 2 giờ</span> làm việc</span></li>
+      <li><span class="check purple"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span><span>Nếu không đạt 80% KPI tháng → <span class="feat-bold">hoàn lại phí quản lý</span></span></li>
+    </ul>
+
+    <a href="#" class="cta purple">Chọn gói này</a>
+  </div>
+
+</div>
+
+<!-- ADD-ON -->
+<div class="addon-section">
+  <div class="addon-title">Dịch vụ bổ sung (Add-on)</div>
+  <div class="addon-sub">Có thể kết hợp với bất kỳ gói nào ở trên</div>
+  <div class="addon-grid">
+    <div class="addon-item">
+      <div>
+        <div class="addon-name">Shopee Live Support</div>
+        <div class="addon-desc">Hỗ trợ setup và điều phối buổi live</div>
+      </div>
+      <div class="addon-price">3.000.000đ / buổi</div>
+    </div>
+    <div class="addon-item">
+      <div>
+        <div class="addon-name">Thiết kế Banner Campaign</div>
+        <div class="addon-desc">Bộ visual đầy đủ cho 1 campaign</div>
+      </div>
+      <div class="addon-price">2.000.000đ / bộ</div>
+    </div>
+    <div class="addon-item">
+      <div>
+        <div class="addon-name">Audit Shop Nhanh</div>
+        <div class="addon-desc">Chẩn đoán toàn bộ shop hiện tại</div>
+      </div>
+      <div class="addon-price">3.000.000đ / lần</div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE -->
+<div class="note" style="margin-top:28px">
+  <strong>Lưu ý:</strong> Tất cả gói đều bao gồm Kick-off meeting, OKR dự án bằng văn bản và hỗ trợ qua kênh liên lạc riêng.<br>
+  Ngân sách quảng cáo Shopee Ads <strong>tính riêng</strong> và do brand chủ nạp trực tiếp trên nền tảng.
+</div>
+
+</body>
+</html>
